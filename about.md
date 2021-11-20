@@ -26,49 +26,18 @@ titles:
 key: page-about
 ---
 
-![TeXt Theme](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/TeXt-home.jpg)
+![Profile Pic](https://raw.githubusercontent.com/pcolladosoto/pcolladosoto.github.io/main/assets/images/pics/About.jpeg)
 
-TeXt is a super customizable Jekyll theme for personal site, team site, blog, project, documentation, etc. Similar to iOS 11 style, it has large and prominent titles, round buttons and cards.
+This site is just a collection of ideas and projects that I believe could be useful to someone, isn't that what the internet was for? If that doesn't work out, I at least don't have to keep on cloning and browsing repositories to look for documentation that's scattered all around :ok_woman:
 
-```javascript
-(() => console.log('Hello, World!'))();
-```
+## Who are you again?
+Call me Pablo (I actually haven't read Moby Dick :whale:). I studied Telematics Engineering at the Universidad de Alcalá in Madrid, Spain. Telematics is nothing more than a branch of Telecommunications dealing mostly with networks such as the Internet or the cell phone provider infrastructures we all so commonly use.
 
-## Features
+Even though I'm not a programmer, I do find it amusing to try and embark on some projects from time to time. In tackling some of them I come across issues that I end up solving (if you could call that a solve) thanks to the help of a ton of individuals that share what they know expecting nothing in return. Eventually, I figured this could be a way of giving a bit (much less than what I have received) back and so, here goes nothing.
 
-- Responsive
-- Semantic HTML
-- Skins
-- Highlight Theme
-- Internationalization
-- Search
-- Table of contents
-- Authors
-- Additional styles (alert, tag, image, icon, button, grid, etc)
-- Extensions (audios, videos, slides, demos)
-- Markdown enhancements ([MathJax](https://www.mathjax.org/), [mermaid](https://mermaidjs.github.io/), [chartjs](http://www.chartjs.org/))
-- Sharing ([AddToAny](https://www.addtoany.com/), [AddThis](https://www.addthis.com/))
-- Comments ([Disqus](https://disqus.com/), [Gitalk](https://gitalk.github.io/), [Valine](https://valine.js.org/en/))
-- Pageview ([LeanCloud](https://leancloud.cn/))
-- Analytics ([Google Analytics](https://analytics.google.com/analytics/web/))
-- RSS ([jekyll-feed](https://github.com/jekyll/jekyll-feed))
+If you have any questions or suggestions about anything you find on the site feel free to drop me an email: I would be delighted to get as much feedback as I possibly can.
 
-## Skins
+## And did you code all this site?
+Nope: I still have some nightmares about misbehaving `<divs>` and CSS animations, no kidding. This page relies on [Jekyll](https://jekyllrb.com) and the [TeXt](https://github.com/kitian616/jekyll-TeXt-theme) theme (which we absolutely love :heart_eyes_cat:) and it's published through [GitHub Pages](https://pages.github.com). You can also find the real, raw content of the site on its [repository](https://github.com/pcolladosoto/pcolladosoto.github.io).
 
-TeXt has 6 built-in skins, you can also set up your own skin.
-
-| `default` | `dark` | `forest` |
-| --- |  --- | --- |
-| ![Default](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/skins_default.jpg) | ![Dark](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/skins_dark.jpg) | ![Forest](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/skins_forest.jpg) |
-
-| `ocean` | `chocolate` | `orange` |
-| --- |  --- | --- |
-| ![Ocean](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/skins_ocean.jpg) | ![Chocolate](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/skins_chocolate.jpg) | ![Orange](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/skins_orange.jpg) |
-
-### Highlight Theme
-
-TeXt use [Tomorrow](https://github.com/chriskempson/tomorrow-theme) as the highlight theme.
-
-| `tomorrow` | `tomorrow-night` | `tomorrow-night-eighties` | `tomorrow-night-blue` | `tomorrow-night-bright` |
-| --- |  --- | --- | --- |  --- |
-| ![Tomorrow](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/highlight_tomorrow.png) | ![Tomorrow Night](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/highlight_tomorrow-night.png) | ![Tomorrow Night Eighties](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/highlight_tomorrow-night-eighties.png) | ![Tomorrow Night Blue](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/highlight_tomorrow-night-blue.png) | ![Tomorrow Night Bright](https://raw.githubusercontent.com/kitian616/jekyll-TeXt-theme/master/screenshots/highlight_tomorrow-night-bright.png) |
+Setting it all up is not too harsh, so I encourage anybody to give it a go!
