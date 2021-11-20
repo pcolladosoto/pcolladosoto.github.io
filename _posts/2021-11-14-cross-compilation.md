@@ -1,6 +1,10 @@
 ---
 title: Cross Compiling stuff with Docker
-tags: Cross-compilation Docker
+tags: cross-compilation Docker
+article_header:
+  type: cover
+  image:
+    src: /assets/images/covers/gcc_n_docker.png
 ---
 
 # Do we really have to compile stuff in the 21st century?
