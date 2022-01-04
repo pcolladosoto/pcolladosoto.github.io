@@ -10,7 +10,7 @@ Let's start at the 'beginning'. When computers communicate among themselves they
 
 Notice how the entire article is named '*What was an IP again?*'. That is purposefully *incorrect*. In order to understand why, we need to take a (small) step back and briefly visit the [*OSI Model*](https://en.wikipedia.org/wiki/OSI_model).
 
-## A quick look at OSI
+## A quick look at the OSI Model
 When approaching any topic in networking, it's usually a good idea to have a conceptual grasp of whatever it is we are up against. At a lowish level, that usually implies thinking about where the topic at hand fits within the layers defined in the OSI model. For our purposes, we will only focus on the [*network layer*](https://en.wikipedia.org/wiki/Network_layer) (i.e. *layer 3*) of said model: a full blown description of OSI is well beyond the scope of this article.
 
 If, on the other hand, you feel more inclined towards the *TCP/IP* model of networks, this discussion would them belong within the *internet layer*. A good comparison of both models can be found [here](https://www.cloudflare.com/en-gb/learning/network-layer/what-is-the-network-layer/).
@@ -64,8 +64,64 @@ If you had no idea about what was going on in the snippet above, be sure to chec
 After learning how we can build a familiar representation of an IP address from the real thing, we can see how:
 
 1. We can generate `2^32 = 4294967296` unique address ranging from `0` to `2^32 - 1 = 4294967295`. Given each Internet-capable device should have its own, unique address, the number is not that large. This is one of the aspects that motivated the appearance and proliferation of [NATs](https://en.wikipedia.org/wiki/Network_address_translation).
-2. Each of the octets in an address will be a number between `0` and `255`. This follows from the fact that a byte's value belongs to the `[0, 2^8 - 1] = [0, 255]` interval.
 
-From the above, we can be sure that `278.16.1.5` is **not** a valid address. These small caveats are crucial when it comes to spotting errors in network configurations.
+2. Each of the octets in an address will be a number between `0` and `255`. This follows from the fact that a byte's value belongs to the `[0, 2^8 - 1] = [0, 255]` interval. Thus, we can be sure that `278.16.1.5` is **not** a valid address. This 'rule of thumb' is crucial when it comes to spotting errors in network configurations.
+
+## What's the difference between IPv4 and IPv6?
+We actually have a better question: what happened to IPv5? The real answer is it never became an official protocol. It was mainly geared towards streaming and real-time applications such as VoIP. Given it used 32-bit addresses it suffered from the same problems than IPv4 and so it was never standardized. You can read (a bit) more on that [here](https://www.lifewire.com/what-happened-to-ipv5-3971327).
+
+Jokes aside, we haven't been *completely* honest with you :scream:. Like many things in the realm of computing, the IP protocol comes in several versions. Up to now we have been dealing with the 'standard' version: IPv4. The thing is, IPv4 was designed at a time where few people could've predicted the adoption the Internet was going to have. After all, networks were born within a military context as a project for the *Defense Advanced Research Projects Agency* (i.e. *DARPA*). Once it was made available to general users some design problems became more noticeable, the most obvious being the shortage of available addresses.
+
+Then, on 1995, the original [IPv6 RFC](https://datatracker.ietf.org/doc/html/rfc1883) is published. Many people (myself included for quite some time) deem IPv6 as 'IPv4 with longer addresses'. However, this approach just misses quite a lot of what IPv6 brings to the table: Link Local Addresses, Unique Local Addresses, restricted datagram fragmentation... You can read more on that [here](https://en.wikipedia.org/wiki/Unique_local_address), [here](https://blog.zivaro.com/need-know-link-local-ipv6-addresses) and [there](https://blogs.infoblox.com/ipv6-coe/common-ipv6-newbie-questions/). You might also want to take a look at the current [IPv6 RFC](https://datatracker.ietf.org/doc/html/rfc8200). [RFC 4864](https://datatracker.ietf.org/doc/html/rfc4864) also offers some very good insight into controversial topics such as why NAT doesn't really add security, something IPv4 supporters usually claim when deciding not migrate to IPv6.
+
+This is not a discussion on IPv6 or a comparison between that and IPv4: we are concerned with subnets and things of that nature. The good thing is the general idea translates seamlessly from IPv4 to IPv6, so the ensuing discussion is applicable to both realms. The most noticeable difference is that IPv6 addresses are 128 bits long instead of 32. That means, we have `2^128 = 3,402823669209385 * 10^38` unique IPv6 addresses: looks like we won't need NAT at all!
+
+### Representing IPv6 addresses
+Just like with IPv4, at the end of the day an IPv6 address is a 128 bit integer. However, you'll see them expressed as hexadecimal numbers: they are much more wieldy than base 10 numbers! There are some other differences too:
+
+1. The address is 'broken up' into 16-bit chunks. Given a hex digit can represent the sames quantities as 4 bits, each 16-bit chunk is translated into 4 hex digits. If this sounds alien-y to you, be sure to take a look at [this](https://www.tutorialspoint.com/hexadecimal-number-system) intro. You can also look for 'intro to hex numbers' in a search engine of your choice. We really like DuckDuckGo though :ok_woman:
+
+2. The 16-bit chunks are separated by colons (i.e. `:`).
+
+3. If several consecutive 16-bit chunks are all zeros (i.e. `0`) you can summarize them with two consecutive colons (i.e. `::`). You can only use this **once**!
+
+4. You can drop leading zeros in a chunk (i.e. `0ABC` can be written as `ABC`).
+
+With these rules we find how the following are valid IPv6 addresses:
+
+    2345:425:2ca1::567:5673:23b5 (this would be equivalent to 2345:0425:2ca1:0000:0000:0567:5673:23b5)
+    2607:f0d0:1002:51::4         (this would be equivalent to 2607:f0d0:1002:0051:0000:0000:0000:0004)
+
+### Thinks to know and fun facts
+Given the natural relation between binary and hex numbers, note we **cannot** write an IPv6 address that's 'too big' as long as we only use valid hex digits (i.e. `0123456789ABCD`) and just 4 of them. In other words, we cannot generate addresses that are wrong but that 'look okay' like `800.433.312.257`. It has just as many digits as `192.168.160.180`, but the former is completely wrong!
+
+A good thing to know is that, if you want to explicitly use an address in applications such as browsers you **need** to enclose them with square brackets (i.e. `[]`). To understand why this is needed think about contacting a web server on a non-default port (i.e. `80` for HTTP and `443` for HTTPS). You would write something like the following in the search bar:
+
+    http://129.168.1.5:8080
+
+Now, if instead of an IPv4 address you use an IPv6 one you would write:
+
+    http://2607:f0d0:1002:51::4:8080
+
+How can the browser tell the port number (i.e. `8080`) apart from the address? They are both delimited through colons... Even though some rather complex logic could work things out, it's easier to just 'guard' the address with a well known character. That way, the browser (or any application) can quickly extract the address and begin sending stuff. Thus, the following is what you *should* write to contact that same process:
+
+    http://[2607:f0d0:1002:51::4]:8080
+
+## Who manages this?
+Now we have been introduced to IPv4 and IPv6 addresses. Time for a pat in the back! :clap:
+
+Managing all these addresses comes with quite a lot of organizational overhead. Even though it's not the topic of this article, we would like to mention that addresses are manged by several organizations (Regional Internet Registrars) that are geographically distributed:
+
+| Geographical Area |     RIR      |                       Website                      |
+| :---------------: | :----------: | :------------------------------------------------: |
+|      Europe       |     RIPE     |   [https://www.ripe.net/](https://www.ripe.net/)   |
+|  Asia & Pacific   |     APNIC    |   [https://www.apnic.net](https://www.apnic.net)   |
+|      Africa       |    AFRINIC   | [https://www.afrinic.net](https://www.afrinic.net) |
+|   Latin America   |     LACNIC   |  [https://www.lacnic.net](https://www.lacnic.net)  |
+|   North America   |     ARIN     |    [https://www.arin.net](https://www.arin.net)    |
+
+This doesn't really concern us, but the sites are a great information source and I find this type of thing quite interesting :woman_shrugging:
 
 ## Time for subnets!
+Now it's time to picture ourselves as network administrators...
+
