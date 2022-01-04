@@ -115,7 +115,7 @@ Managing all these addresses comes with quite a lot of organizational overhead. 
 | Geographical Area |     RIR      |                       Website                      |
 | :---------------: | :----------: | :------------------------------------------------: |
 |      Europe       |     RIPE     |   [https://www.ripe.net/](https://www.ripe.net/)   |
-|  Asia & Pacific   |     APNIC    |   [https://www.apnic.net](https://www.apnic.net)   |
+|  Asia & Pacific   |     APNIC    |   [https://www.apnic.net](https://www.apnic.net)   |
 |      Africa       |    AFRINIC   | [https://www.afrinic.net](https://www.afrinic.net) |
 |   Latin America   |     LACNIC   |  [https://www.lacnic.net](https://www.lacnic.net)  |
 |   North America   |     ARIN     |    [https://www.arin.net](https://www.arin.net)    |
@@ -123,5 +123,198 @@ Managing all these addresses comes with quite a lot of organizational overhead. 
 This doesn't really concern us, but the sites are a great information source and I find this type of thing quite interesting :woman_shrugging:
 
 ## Time for subnets!
-Now it's time to picture ourselves as network administrators...
+Now it's time to picture ourselves as network administrators... How would we go about managing a corporate network or even a home network? Should we manage addresses as a bunch of loose identifiers with no relation whatsoever? As you might have guessed, that's not how stuff works!
 
+Simply put, subnets are *logical* divisions of the IP address space. Now, that sounds like some new-age mumbo jumbo right? It's often said that the Internet is a *network of networks*. It's something most of us repeat like a mantra but... what does it mean?
+
+Many of us have never worked with networks detached from the Internet. The common use case of a home LAN (Local Area Network) is often (if not always) equipped with an Internet-capable connection. The thing is, this network could be completely isolated from the Internet and still be very useful. We could access local services like, for instance, a Minecraft server running on a machine plugged into our home router. We can now begin to see how LANs are networks in their own right. It just so happens that we decide to connect them to the larger Internet.
+
+Like our home, many others are also connected to the Internet. This not only happens with domestic LANs: corporate networks are a common example of local networks that are attached to the Internet in some way or another. The great thing with this idea is that, no matter how big a given network is, we can always regard it as a local network that's attached to the larger Internet. We can even move a step further and subdivide a local network into more subnets. A sub-subnet would then be attached to a network of networks (the original, large subnet) which itself is attached to the Internet. You see how we can stack subnets on and on? This is what we mean by subnets being a logical division: they help us organize stuff.
+
+Aside from easing easing network management, subnets also make the Internet more efficient. We a machine *A* sends a datagram to a machine *B* it has to be forwarded through an arbitrary number of routers (or, more specifically, layer 3 switches). These routers don't know where **every** IP address can be reached: if they did, they would need to have lookup tables with `2^32` entries for IPv4 and with `2^128` entries for IPv6! Instead they contain a 'rough' estimate of where the datagrams need to be forwarded. This rough estimate comes in the shape of subnets: routers know where to forward a packet so that it gets closer to the destination subnet. They can rest assured that as the packet travels it will reach routers knowing more and more about the actual destination of the datagram. In this way, the datagram traverses a 'funnel' until it reaches its destination.
+
+If we continue 'abusing' the funnel metaphor we can establish a relation between the funnel's diameter and the specificity of the subnet. In other words, the smaller the subnet (that is, the less addresses it contains) the smaller the funnel's diameter. This idea is at the heart of the [longest matching prefix](https://en.wikipedia.org/wiki/Longest_prefix_match) rule on routers. We are deviating a bit from the topic of subnets at this point and entering the realm of routing. However, these two concepts are intrinsically related. Routing deems the Internet as a collection of arbitrarily sized subnets. This allows routing to be done in a hierarchical, orderly and efficient manner.
+
+Now that we have a loose idea of what subnets are let's take a look at how they're specified. We really think it will make matters that much clearer!
+
+### Specifying subnets
+From an address point of view, a subnet is just a set of addresses. Nowadays these are almost always specified using the [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) (Classless Inter-Domain Routing) syntax, but we'll also take a look at the 'traditional' way of defining them. We'll even look at classful subnets!
+
+Subnets are specified by an *network address* and a *subnet mask*. The term mask is used due to how these two are related: the mask is applied to the address through a set of bitwise operators. These bitwise operators are the classic `AND`, `OR`, `XOR` and `NOT`. For those who learned programming in C, the operators are `&`, `|`, `^` and `~`. This way of handling numbers is very common in the realm of electronics. It's very common to have to handle (and often burn) physical `AND` and `NOT` gates on digital electronics courses...
+
+We're presenting the outcome of logical operations in a couple table as a reminder:
+
+| A | B | AND | OR | XOR | NOT A |
+|:-:|:-:|:---:|:--:|:---:|:-----:|
+| 0 | 0 |  0  | 0  |  0  |   1   |
+| 0 | 1 |  0  | 1  |  1  |   1   |
+| 1 | 0 |  0  | 1  |  1  |   0   |
+| 1 | 1 |  1  | 1  |  0  |   0   |
+
+We'll start by defining subnets in a somewhat 'arid' way. We promise examples will make this clearer.
+
+1. A subnet's network address is defined as the result of applying the `AND` operation to the subnet's address and subnet mask:
+
+        net_addr = subnet_addr & subnet_mask
+
+2. A subnet's broadcast address is defined as the result of applying the `OR` operation to subnet's address and the inverse of the subnet mask:
+
+        brd_addr = subnet_addr | (~subnet_mask)
+
+3. The subnet's addresses are contained in the `[net_addr, brd_addr]` interval:
+
+        net_addr <= a_subnet_addr <= brd_addr
+
+Yeah, we know: what does that even mean? Let's begin by looking into what the network and broadcast addresses are.
+
+### The subnet's limits
+The lowest and highest addresses in a subnet do theoretically belong to a subnet. However, unless we are dealing with a point-to-point link not all of them are 'usable':
+
+1. The *network address* is the lowest one in the subnet's range. This address has no 'real' use in practice: it just identifies the network. This address is the one that will often be provided with the subnet mask to identify the actual subnet. Even though we'd bending the definition of subnets, we can unambiguously identify a subnet with a handful of addresses as long as we provided the correct subnet mask. However, the most common choice is the network address as it makes things much clearer.
+
+2. The *broadcast address* is the larges address in the subnet's range. When a host addresses a datagram to this address it's broadcasted to the entire subnet. This address **is not** forwarded across routers. Back in the day it was (wrongly) forwarded. This opened up the possibility for [Smurf Attacks](https://en.wikipedia.org/wiki/Smurf_attack), which made it possible to have the entire Internet pinging a poor machine...
+
+In the specific case where we have just two machines on a single link these two addresses loose quite a lot of meaning: each machine would have one of the two addresses on that subnet. One of them would indeed be the network address and the other one would be the subnet address... The catch is some implementations will not allow machines to use these two addresses as regular IP addresses at all... In any case, this is more of a toy example, don't take it too seriously :upside_down_face:.
+
+You can find a nice discussion on network and broadcast addresses on the [Network Engineering StackExchange](https://networkengineering.stackexchange.com/questions/11200/what-is-the-purpose-of-network-address)
+
+### The subnet mask
+A subnet mask is just a string of as many bits as the IP address: it's 32 bits long on IPv4 and 128 bits long on IPv6. When we were dealing with addresses we found out how we preferred to express them as decimal or hex numbers so that we could have an easier time handling them. The picture is a bit different when dealing with subnet masks. As we need to combine them with network addresses through bit-level operations we'll find it's better to think of them as regular binary numbers.
+
+Now, a subnet mask tells us which bits define the subnet and which identify a machine **within** that subnet. It logically divides the address in two distinct parts. Wherever we find a `1` on the subnet mask, we can be sure that bit is part of the subnet address: addresses with the exact same subnet address bits belong to the same subnet. Those bits showing a `0` on the subnet mask will be used to identify hosts belonging to that subnet. Thus, we can regard the subnet mask as a number telling us which bits define a logical address block. Those that can be 'freely' altered identify machines within that block.
+
+Let's look at an example with a real-world scenario. We'll always be working with the `192.168.1.0` subnet address and a subnet mask of `11111111 11111111 11111111 00000000`. Notice we have purposefully spaced the binary number so that it's easier to read. However, the spaces have no 'real' meaning. Let's apply the operations:
+
+    net_addr = subnet_addr & subnet_mask
+
+    11000000 10101000 00000001 00000000 <- subnet_addr (Recall the example of address-to-binary conversion we presented before!)
+    11111111 11111111 11111111 00000000 <- subnet_mask
+    ----------------------------------- <-     AND
+    11000000 10101000 00000001 00000000 -> 192.168.1.0
+
+    brd_addr = subnet_addr | (~subnet_mask)
+
+    11000000 10101000 00000001 00000000 <-  subnet_addr
+    00000000 00000000 00000000 11111111 <- ~subnet_mask
+    ----------------------------------- <-      OR
+    11000000 10101000 00000001 11111111 ->  192.168.1.255
+
+Now we know that any address belonging to this subnet must be within the `[192.168.1.0, 192.168.1.255]` range. What's more, usable addresses are in the range `[192.168.1.1, 192.168.1.254]` (or `(192.168.1.0, 192.168.1.255)` for those mathematicians out there :stuck_out_tongue_winking_eye:)
+
+If we apply the concept of what a subnet mask is to the above we can see how an IPv4 address such as `192.168.1.3` within the previous subnet can be logically seen as:
+
+              Subnet              Host
+    ------------------------- + --------
+    11000000 10101000 00000001  00000011
+
+In a more general way, we can regard addresses in this subnet as (`QWERTYZX` each stand for a single bit):
+
+              Subnet              Host
+    ------------------------- + --------
+    11000000 10101000 00000001  QWERTYZX
+
+This is a key idea that's worth reviewing a couple of times! It's also important to note that the 'larger' the subnet mask is (i.e. the more lading `1`s it has) the less hosts it will be able to provide service to. However, you'll have more subnets at your disposal. It's crucial to know that, no matter how you partition a network into subnets, you'll always have the same number of available addresses (well, you're loosing 2 on each subnet (network and broadcast), but you get the point). Interconnection between subnets is done by routers which can filter traffic, so if you want to have a tight control on traffic flows you can maybe deploy more-but-smaller subnets. If on the other hand you're managing a subnet where every host should 'see' each other you can maybe opt for a large subnet. In the end it's a matter of reaching a compromise based on the network's needs!
+
+### Making subnet masks a bit more wieldy
+What if I told you that there's an easier way to define a subnet than by specifying the subnet mask as a binary number? Cool right? Before walking through the two ways of specifying them let's talk a bit about history before.
+
+#### The age of classful networks
+We've already seen how the initial design of IPv4 didn't really predict the size the Internet would reach. It estimated a way more modest usage, and so it made several assumptions as to what network sizes were going to likely be. That's why they defined a set of *subnet classes* based on size:
+
+1. Class *A* subnets had an associated mask of `11111111 00000000 00000000 00000000`. They were intended to be deployed wherever a large number of addresses was required.
+2. Class *B* subnets had an associated mask of `11111111 11111111 00000000 00000000`. These were designed with mid-sized network needs in mind.
+3. Class *C* subnets had an associated mask of `11111111 11111111 11111111 00000000`. These were devised for small networks.
+4. Up to now, all IPv4 addresses were *unicast*. Even though it doesn't really concern us, when we send a datagram to a *unicast* address it'll only reach a single machine. When we send it to a *multicast* address, it'll be relayed to (gasp) multiple hosts. A common application of multicast addresses is the broadcast of multimedia streams for instance. Now, class *D* addresses are just that, multicast addresses.
+5. The initial design set some addresses apart for experimentation too. These are contained in the so called class *E*.
+
+As you might expect, these definitions only apply to the realm of IPv4. Don't take the above too seriously, you can just read [this Wikipedia entry](https://en.wikipedia.org/wiki/Classful_network) if you want a bit more of information. The bottom line is the initial design of the Internet partitioned the entire IPv4 addressing space into a set of classes, which made subnetting a lot more rigid than it's today.
+
+#### Enter CIDR
+CIDR (or, as we said before, Classless Inter-Domain Routing) is a way of defining subnets in a much more flexible way. In terms of notation it all boils down to specifying the subnet mask as `/x`, where `x` is a number on the `[0, 32]` interval. That `x` is just the number of leading `1`s on the subnet mask:
+
+    /1  -> 10000000 00000000 00000000 00000000
+    /8  -> 11111111 00000000 00000000 00000000 <- These are the old Class A subnets!
+    /12 -> 11111111 11110000 00000000 00000000
+    /16 -> 11111111 11111111 00000000 00000000 <- These are the old Class B subnets!
+    /24 -> 11111111 11111111 11111111 00000000 <- These are the old Class C subnets!
+    /32 -> 11111111 11111111 11111111 11111111
+
+Now we are not restricted to just `/8`, `/16` and `/24`: we can have a `/12` subnet too! This is what motivates the C in CIDR.
+
+An example of a CIDR subnet would be `192.168.1.0/24`, which has usable addresses ranging from `192.168.1.1` to `192.168.1.254`. Note you can also define the subnet as, say, `192.168.1.5/24`. When you apply the `AND` operation to those two you'll end up with the same network address (i.e. `192.168.1.0`). However, people often use the network address for specifying the subnet: it makes understanding stuff easier and that's actually the purpose of the network address...
+
+#### The traditional notation
+Those who have worked with Cisco equipment are more used to another syntax. Instead of relying on the `/x` syntax, we can also specify the subnet mask as another dotted decimal address, just like a regular IPv4 address. The following presents some CIDR-to-traditional equivalencies:
+
+    /8  -> /255.0.0.0
+    /12 -> /255.240.0.0
+    /16 -> /255.255.0.0
+    /24 -> /255.255.255.0
+    /32 -> /255.255.255.255
+
+Pay special attention to the `/12` case: what's easier to handle, `/12` or `/255.240.0.0`? We at least feel strongly inclined toward the former option... We can define the example subnet in the previous section with this notation as `192.168.1.0/255.255.255.0`.
+
+Evn though a bit more unwieldy, this traditional approach is needed if we are to deal with 'weird' subnets. Imagine the following:
+
+    subnet_mask = 11111111 11111111 11111111 00000001 === 255.255.255.1 === /?
+
+    11000000 10101000 00000001 00000000 <- subnet_addr
+    11111111 11111111 11111111 00000001 <- subnet_mask
+    ----------------------------------- <-     AND
+    11000000 10101000 00000001 00000000 -> 192.168.1.0
+
+    brd_addr = subnet_addr | (~subnet_mask)
+
+    11000000 10101000 00000001 00000000 <-  subnet_addr
+    00000000 00000000 00000000 11111110 <- ~subnet_mask
+    ----------------------------------- <-      OR
+    11000000 10101000 00000001 11111110 ->  192.168.1.254
+
+The subnet defined in the previous example is quite anomalous. According to the concept of what a subnet mask 'tells' us we can see how the addresses belonging to this subnet need to have a `192.168.1` prefix and the also **must** have a trailing `0` (i.e. the least significant bit must be `0`)! The following are examples of valid and invalid addresses:
+
+    11000000 10101000 00000001 00000010 -> 192.168.1.2 belongs to the 192.168.1.0/255.255.255.1 subnet! :)
+    11000000 10101000 00000001 00000011 -> 192.168.1.3 doesn't belong to the 192.168.1.0/255.255.255.1 subnet! O_o
+
+### Does an address belong to a subnet?
+How can we check we're right? Just `AND` the subnet mask and the candidate IP address together. If the result is the network address for the subnet you're checking it does belong to the subnet at hand. If it doesn't... bad luck!
+
+    subnet_addr = 11000000 10101000 00000001 00000000
+
+    11000000 10101000 00000001 00000010 <- 192.168.1.2
+    11111111 11111111 11111111 00000001 <- 255.255.255.1
+    ----------------------------------- <-     AND
+    11000000 10101000 00000001 00000000 == subnet_addr :)
+
+    11000000 10101000 00000001 00000011 <- 192.168.1.3
+    11111111 11111111 11111111 00000001 <- 255.255.255.1
+    ----------------------------------- <-     AND
+    11000000 10101000 00000001 00000001 != subnet_addr O_o
+
+Even though this example is rather interesting, we have never encountered anything like this in the 'wild'. Notice how the address space for this subnet **is not** consecutive. That is, the first usable address would be `192.168.1.2`, the second one would be `192.168.1.4`, the third one would be `192.168.1.6` and so on. This is bound to confuse users and administrators in the not even long run and, honestly, using this type of subnet masks is asking for trouble...
+
+In a real-world scenario you'll usually (if not always) encounter subnets that can be expressed as a CIDR block. This simplifies checking whether an address belongs to a subnet quite a lot: you just have to see whether the address belongs to the `[net_address, broadcast_address]` range!
+
+### What about IPv6?
+Just like we said before, all these subnet ideas transition cleanly to the IPv6 realm. You'll commonly have to deal with CIDR style subnet masks and you'll just have to bear in mind that these can be as high as `/128` instead of `/32`.
+
+### What subnet contains a set of IP addresses?
+This question is quite tricky to answer in absolute terms. As with many things in life, the actual answer is it depends... They 'witty' and 'wrong' answer is that the `0.0.0.0/0` subnet contains the given addresses and that's actually always true!
+
+When faced with such a question you should usually ask for more information. Begin by asking for either the network address or the broadcast address. If you know a single address belonging to the target subnet and you apply the definitions of the network and broadcast addresses you can work out thr actual subnet. As an aide you can try to find out the default gateway's (i.e. router's) address. It's usually either the first or last usable address, although this **is not** a requirement. If you know it you can make a pretty educated guess as to what the network or broadcast addresses are.
+
+In any case, this scenario is something that's pretty different from case to case: best of luck!
+
+## Summing up
+At this point we've covered pretty much everything pertaining subnets that anyone needs to know on an everyday basis. You can now:
+
+1. Know the limit addresses of a subnet.
+2. Check whether an address belongs to a subnet.
+3. Define subnets containing a set of given addresses.
+
+All in all, these ideas are sometimes taken for granted but we have found out how they can get more complex than what wou could've initially expected.
+
+---
+
+If you have any comments, questions or suggestions, feel free to drop me an email!
+
+Thanks for your time! Hope you found this useful :smile_cat:
