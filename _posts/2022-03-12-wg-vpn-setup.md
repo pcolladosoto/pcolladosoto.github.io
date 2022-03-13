@@ -14,6 +14,8 @@ In this article we'll turn our attention to another contender jnot listed above:
 
 We'll walk you through how to install and deploy a WireGuard-based VPN on [Fedora 35](https://getfedora.org). However, it shouldn't be a massive headache to modulate these steps to other platforms. The most interesting part (at least we think it is) walks you through how to generate certificates for new clients so that you can incorporate anybody you want to to your brand-new and shiny VPN.
 
+Bear in mind that the certificates we'll be generating **do not** allow clients using them to connect to the Internet. That is, when the VPN is active on a client other than the server you'll not be able to connect to the Internet. In order to work around that you'll need to NAT connections through the server. This is something we discuss on [this](2022-03-13-wg-access-control.md) article.
+
 Strapped in? Let's go!
 
 ## Getting a copy of Fedora 35
