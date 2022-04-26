@@ -131,6 +131,68 @@ Unmounting a partition is a matter of calling [`umount(8)`](https://man7.org/lin
 ## We got there!
 We did it! If you want to save some modifications you just have to make them effective and then unmount the image. After that, your `*.img` file will contain those changes no matter where you go. Isn't that cool?
 
+## A script automating it all!
+The following script will automatically mount the `boot` partition and enable SSH on a Raspberry Pi the first time it boots. Please bear in mind this script is by no means 'sturdy', so it might break especially when parsing `fdisk`'s output. We're just providing it as an example. However, the important and useful information is the one you'll find above! :point_up:
+
+```bash
+#!/bin/bash
+
+# Check we are running as root!
+if [ $EUID -ne 0 ]
+then
+    echo "Run me as root please :P"
+    exit -1
+fi
+
+# Check we only received one argument!
+if [ $# -ne 2 ]
+then
+    printf "Usage: %s <image_file> <mountpoint>\n" $0
+    exit -1
+fi
+
+# Check if the file exists
+if [ ! -e $1 ]
+then
+    echo "Couldn't find the image at $1. Quitting..."
+    exit -1
+fi
+
+# Check the mountpoint exists
+if [ ! -d $2 ]
+then
+    echo "Couldn't find the mountpoint at $2. Quitting..."
+    exit -1
+fi
+
+printf "Analyzing image on file %s\n" $1
+
+# Get the sector size and partition offsets
+sector_size=$(fdisk -l $1 | head -n 2 | tail -n 1 | awk '{print $8}')
+boot_offset=$(fdisk -l $1 | tail -n 2 | head -n 1 | awk '{print $2}')
+rootfs_offset=$(fdisk -l $1 | tail -n 1 | awk '{print $2}')
+
+printf "Detected sector data:\n\tSector Size   -> %8d bytes\n\tBoot Offset   -> %8d sectors\n\tRootfs Offset -> %8d sectors\n"\
+        $sector_size $boot_offset $rootfs_offset
+
+# Mount the boot partition
+printf "Mounting the boot partition...\n"
+mount -t vfat -o loop,offset=$(($sector_size * $boot_offset)) $1 $2
+
+# Enable SSH headlessly
+printf "Touching the ssh file to headlessly enable SSH...\n"
+touch $2/ssh
+
+# Sync the changes and unmount the boot partition
+printf "Syncing changes and unmounting the boot partition...\n"
+sleep 2
+sync && sudo umount $2
+
+printf "Finished modifying the image! Ready to burn :P\n"
+
+exit 0
+```
+
 ---
 If you have any comments, questions or suggestions, feel free to drop me an email!
 
