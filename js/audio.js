@@ -1,21 +1,22 @@
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const oscillators = [];
 
 export function genOscillator(freqHz) {
     const oscillator = audioCtx.createOscillator();
 
     oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(freqHz, audioCtx.currentTime);
-    // oscillator.start();
-    oscillators.push(oscillator);
 
    return oscillator;
 }
 
-export function genGain(gain, oscillator) {
+export function genGain(gain, oscillator, ...other) {
     const gainNode = audioCtx.createGain();
     gainNode.gain.setValueAtTime(gain, audioCtx.currentTime);
     oscillator.connect(gainNode);
+
+    for (var aNode of other)
+        aNode.connect(gainNode);
+
     return gainNode;
 }
 
@@ -58,13 +59,17 @@ export function disconnectFromDest(aNode) {
     aNode.disconnect();
 }
 
-export function triggerOscillators() {
-    for (var i = 0; i < oscillators.length; i++) {
-        console.log(`Starting oscillator ${i}`);
-        oscillators[i].start();
+export function triggerOscillators(oscillators) {
+    for (var oscName in oscillators) {
+        console.log(`Starting oscillator ${oscName}`);
+        oscillators[oscName].start();
     }
 }
 
 export function setGain(gainNode, gain) {
     gainNode.gain.setValueAtTime(gain, audioCtx.currentTime);
+}
+
+export function setFreq(oscillatorNode, freqHz) {
+    oscillatorNode.frequency.setValueAtTime(freqHz, audioCtx.currentTime);
 }

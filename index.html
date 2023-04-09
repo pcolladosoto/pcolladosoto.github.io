@@ -22,16 +22,54 @@
                     <canvas id="freqDomain"></canvas>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col">
-                    <button type="button" class="btn btn-dark" onclick="playSound();">Play!</button>
+                    <span>Master</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <button type="button" class="btn btn-dark" id="connectChain">Play!</button>
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-light" onclick="stopSound();">Stop!</button>
+                    <button type="button" class="btn btn-light" id="disconnectChain">Stop!</button>
                 </div>
                 <div class="col">
-                    <!-- <input type="range" min="0" max="100" value="50" class="slider" id="masterVolume"> -->
                     <input type="range" class="form-range" min="0" max="1" step="0.05" id="masterVolume">
+                </div>
+            </div>
+
+            <div class="row">
+                <span>Oscilador A</span>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <input type="number" aria-label="Frequency" class="form-control" placeholder="Frecuencia [Hz]" id="oscAFreq">
+                </div>
+                <div class="col">
+                    <span>Amplitud</span>
+                    <input type="range" class="form-range" min="0" max="1" step="0.05" value="1" id="oscAVolume">
+                </div>
+                <div class="col">
+                    <button class="btn btn-outline-secondary" type="button" id="oscAApply">Aplicar</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <span>Oscilador B</span>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <input type="number" aria-label="Frequency" class="form-control" placeholder="Frecuencia [Hz]" id="oscBFreq">
+                </div>
+                <div class="col">
+                    <span>Amplitud</span>
+                    <input type="range" class="form-range" min="0" max="1" step="0.05" value="1" id="oscBVolume">
+                </div>
+                <div class="col">
+                    <button class="btn btn-outline-secondary" type="button" id="oscBApply">Aplicar</button>
                 </div>
             </div>
         </div>
