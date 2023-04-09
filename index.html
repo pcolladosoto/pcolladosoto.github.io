@@ -9,37 +9,18 @@
             integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
             crossorigin="anonymous"
         >
-
-        <!-- <script type="text/javascript">
-            let audioContext;
-
-            try {
-            audioContext =
-                new (window.AudioContext || window.webkitAudioContext)();
-            } catch (error) {
-                window.alert(
-                    `Sorry, but your browser doesn't support the Web Audio API!`
-                );
-            }
-
-            if (audioContext !== undefined) {
-                console.log("We should play...")
-                // create Oscillator node
-                const oscillator = audioContext.createOscillator();
-            
-                oscillator.type = "sine";
-                oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // value in hertz
-                oscillator.connect(audioContext.destination);
-                oscillator.start();
-            }
-        </script> -->
     </head>
     <body>
         <!-- <h1>Hello, world!</h1> -->
 
         <div class="container-fluid">
             <div class="row">
-                <canvas id="myChart"></canvas>
+                <div class="col">
+                    <canvas id="timeDomain"></canvas>
+                </div>
+                <div class="col">
+                    <canvas id="freqDomain"></canvas>
+                </div>
             </div>
             <div class="row">
                 <div class="col">
@@ -47,6 +28,10 @@
                 </div>
                 <div class="col">
                     <button type="button" class="btn btn-light" onclick="stopSound();">Stop!</button>
+                </div>
+                <div class="col">
+                    <!-- <input type="range" min="0" max="100" value="50" class="slider" id="masterVolume"> -->
+                    <input type="range" class="form-range" min="0" max="1" step="0.05" id="masterVolume">
                 </div>
             </div>
         </div>
@@ -64,6 +49,15 @@
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"
+            integrity="sha512-wUYbRPLV5zs6IqvWd88HIqZU/b8TBx+I8LEioQ/UC0t5EMCLApqhIAnUg7EsAzdbhhdgW07TqYDdH3QEXRcPOQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer">
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
 
         <script type="module" src="main.js"></script>
     </body>
