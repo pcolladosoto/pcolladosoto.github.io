@@ -26,13 +26,13 @@ const defaultTimeOptions = {
         x: {
             title: {
                 display: true,
-                text: "Tiempo [ms]"
+                text: "Time [ms]"
             }
         },
         y: {
             title: {
                 display: true,
-                text: "Amplitud"
+                text: "Amplitude"
             }
         }
     }
@@ -62,13 +62,13 @@ const defaultFreqOptions = {
             type: "logarithmic",
             title: {
                 display: true,
-                text: "Frecuencia [Hz]"
+                text: "Frequency [Hz]"
             }
         },
         y: {
             title: {
                 display: true,
-                text: "Potencia"
+                text: "Power"
             }
         }
     }
