@@ -16,9 +16,14 @@ const defaultTimeOptions = {
                     enabled: true,
                 },
                 pinch: {
-                    enabled: true
+                    enabled: false
                 },
                 mode: 'x',
+            },
+            pan: {
+                enabled: true,
+                mode: 'x',
+                threshold: 1
             }
         }
     },
@@ -54,6 +59,11 @@ const defaultFreqOptions = {
                     enabled: true
                 },
                 mode: 'x',
+            },
+            pan: {
+                enabled: true,
+                mode: 'x',
+                threshold: 1
             }
         }
     },
@@ -78,30 +88,30 @@ const oscADataset = {
     label: "Oscillator A",
     data: [],
     lineTension: 0,
-    backgroundColor: 'transparent',
-    borderColor: '#007bff',
+    backgroundColor: '#fdb60d',
+    borderColor: '#fdb60d',
     borderWidth: 4,
-    pointBackgroundColor: '#007bff'
+    pointBackgroundColor: '#fdb60d'
 }
 
 const oscBDataset = {
     label: "Oscillator B",
     data: [],
     lineTension: 0,
-    backgroundColor: 'transparent',
-    borderColor: '#007b00',
+    backgroundColor: '#1bbfec',
+    borderColor: '#1bbfec',
     borderWidth: 4,
-    pointBackgroundColor: '#007b00'
+    pointBackgroundColor: '#1bbfec'
 }
 
 const mixDataset = {
     label: "Mix",
     data: [],
     lineTension: 0,
-    backgroundColor: 'transparent',
-    borderColor: '#ff8a01',
+    backgroundColor: '#8cbb7d',
+    borderColor: '#8cbb7d',
     borderWidth: 4,
-    pointBackgroundColor: '#008a01',
+    pointBackgroundColor: '#8cbb7d',
 }
 
 function genSampleLabels(n) {

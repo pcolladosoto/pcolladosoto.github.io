@@ -24,13 +24,6 @@
                 </header>
 
                 <div class="p-3 mb-4 bg-body-tertiary rounded-3">
-                    <!-- <div class="container-fluid py-5">
-                        <h1 class="display-5 fw-bold">Visualisations</h1>
-                        <p class="col-md-8 fs-4">
-                            These two graphs show the time domain and frequency domain signals of both oscillators.
-                        </p>
-                    </div> -->
-
                     <div class="align-items-md-stretch row">
                         <div class="col-md-6">
                             <h2 class="display-7 text-center">Time Domain</h2>
@@ -48,11 +41,11 @@
                         </div>
                     </div>
                     <div class="align-items-md-stretch row">
-                        <div class="col-md-6 text-center">
-                            <p class="fs-4">You can zoom into the graph and move around!</p>
-                        </div>
-                        <div class="col-md-6 text-center">
-                            <p class="fs-4">You can zoom into the graph and move around!</p>
+                        <div class="col-md-12 text-center">
+                            <p class="fs-4">
+                                You can zoom into the graphs with the mouse wheel and pan by clicking and dragging.<br>
+                                You can also hide signals by clicking on their name at the legend on top.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -121,7 +114,8 @@
                     &copy; Pablo Collado Soto - 2023 - Made with {<a
                         href="https://getbootstrap.com">Bootstrap 5</a>, <a
                         href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">WebAudio API</a>, <a
-                        href="https://www.chartjs.org">Chart.js</a>}
+                        href="https://www.chartjs.org">Chart.js</a>, <a
+                        href="https://github.com/corbanbrook/dsp.js/">dsp.js</a>}
                 </footer>
             </div>
         </main>
@@ -138,6 +132,9 @@
             crossorigin="anonymous">
         </script>
 
+        <!-- Check https://github.com/chartjs/chartjs-plugin-zoom/issues/53 for more info! -->
+        <script src="./js/hammer.min.js"></script>
+
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script
@@ -146,8 +143,6 @@
             crossorigin="anonymous"
             referrerpolicy="no-referrer">
         </script>
-
-        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
 
         <script type="module" src="main.js"></script>
     </body>
