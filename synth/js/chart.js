@@ -16,7 +16,7 @@ const defaultTimeOptions = {
                     enabled: true,
                 },
                 pinch: {
-                    enabled: false
+                    enabled: true
                 },
                 mode: 'x',
             },
