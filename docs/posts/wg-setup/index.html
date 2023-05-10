@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Setting up a WireGuard VPN | Just another Jedi...</title>
+<meta name="keywords" content="networking, wireguard, vpn">
+<meta name="description" content="So&hellip; what are VPNs really? Well, that&rsquo;s not really a straightforward question. Put simply, Virtual Private Networks (that&rsquo;s where VPN comes from :gasp:) allow us to leverage public networks such as the Internet in such a way that those communicating through the VPN really think they&rsquo;re on a real private network: they have no idea their traffic is actually traversing public networks at all!
+Now, this can be accomplished in several ways: we have IPsec and MPLS-based VPNs for instance.">
+<meta name="author" content="Pablo Collado Soto">
+<link rel="canonical" href="https://pcolladosoto.github.io/posts/wg-setup/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a86159a73db327948c7febaf1826dc57ee82eaaa0ad85d7e32ef3abb8c655650.css" integrity="sha256-qGFZpz2zJ5SMf&#43;uvGCbcV&#43;6C6qoK2F1&#43;Mu86u4xlVlA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://pcolladosoto.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://pcolladosoto.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://pcolladosoto.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://pcolladosoto.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://pcolladosoto.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Setting up a WireGuard VPN" />
+<meta property="og:description" content="So&hellip; what are VPNs really? Well, that&rsquo;s not really a straightforward question. Put simply, Virtual Private Networks (that&rsquo;s where VPN comes from :gasp:) allow us to leverage public networks such as the Internet in such a way that those communicating through the VPN really think they&rsquo;re on a real private network: they have no idea their traffic is actually traversing public networks at all!
+Now, this can be accomplished in several ways: we have IPsec and MPLS-based VPNs for instance." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://pcolladosoto.github.io/posts/wg-setup/" /><meta property="og:image" content="https://pcolladosoto.github.io/me.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-03-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-03-12T00:00:00+00:00" /><meta property="og:site_name" content="Just another Jedi..." />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://pcolladosoto.github.io/me.png"/>
+
+<meta name="twitter:title" content="Setting up a WireGuard VPN"/>
+<meta name="twitter:description" content="So&hellip; what are VPNs really? Well, that&rsquo;s not really a straightforward question. Put simply, Virtual Private Networks (that&rsquo;s where VPN comes from :gasp:) allow us to leverage public networks such as the Internet in such a way that those communicating through the VPN really think they&rsquo;re on a real private network: they have no idea their traffic is actually traversing public networks at all!
+Now, this can be accomplished in several ways: we have IPsec and MPLS-based VPNs for instance."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://pcolladosoto.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Setting up a WireGuard VPN",
+      "item": "https://pcolladosoto.github.io/posts/wg-setup/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Setting up a WireGuard VPN",
+  "name": "Setting up a WireGuard VPN",
+  "description": "So\u0026hellip; what are VPNs really? Well, that\u0026rsquo;s not really a straightforward question. Put simply, Virtual Private Networks (that\u0026rsquo;s where VPN comes from :gasp:) allow us to leverage public networks such as the Internet in such a way that those communicating through the VPN really think they\u0026rsquo;re on a real private network: they have no idea their traffic is actually traversing public networks at all!\nNow, this can be accomplished in several ways: we have IPsec and MPLS-based VPNs for instance.",
+  "keywords": [
+    "networking", "wireguard", "vpn"
+  ],
+  "articleBody": "So… what are VPNs really? Well, that’s not really a straightforward question. Put simply, Virtual Private Networks (that’s where VPN comes from :gasp:) allow us to leverage public networks such as the Internet in such a way that those communicating through the VPN really think they’re on a real private network: they have no idea their traffic is actually traversing public networks at all!\nNow, this can be accomplished in several ways: we have IPsec and MPLS-based VPNs for instance. At this point it’s important to point out a subtle-yet-crucial thing: a VPN is a set of services which can be provided by different technologies. The ones we’ve listed just now are two examples of how different technologies can offer VPN-like services. However, MPLS and IPsec couldn’t be more apart in terms of what they do and what they are. What’s more, different VPN implementations (i.e. technologies) function at different levels of the OSI protocol layer! These breadth of flavours offers a great deal of flexibility: some technologies are better at certain things than others, so choose whatever fits you best.\nIn this article we’ll turn our attention to another contender jnot listed above: WireGuard. When compared to another known contender in the VPN area (that’s no other than OpenVPN), we find how WireGuard runs within the kernel on Linux-based hosts. This provides a level of performance and (maybe more importantly in some scenarios) a huge level of flexibility when it comes to configuration.\nWe’ll walk you through how to install and deploy a WireGuard-based VPN on Fedora 35. However, it shouldn’t be a massive headache to modulate these steps to other platforms. The most interesting part (at least we think it is) walks you through how to generate certificates for new clients so that you can incorporate anybody you want to to your brand-new and shiny VPN.\nBear in mind that the certificates we’ll be generating do not allow clients using them to connect to the Internet. That is, when the VPN is active on a client other than the server you’ll not be able to connect to the Internet. In order to work around that you’ll need to NAT connections through the server. This is something we discuss on this article.\nStrapped in? Let’s go!\nGetting a copy of Fedora 35 With the years we’ve become quite lazy: once we discovered Vagrant we kind of stopped looking for ISOs around the Internet. We plan on (at some point) writing about Vagrant where we look a t it a bit more in depth. The good thing is we can get started in a (fairly) straightforward way:\nInstall VirtualBox for your OS. If you’d rather use a different Virtual Machine (i.e. VM) provider you can do so, but beware about possible hurdles down the road. If you have no idea what a VM provider is, just install VirtualBox and you’ll be fine.\nFollow the installation instructions for your OS here.\nOnce Vagrant is up and running you can just run vagrant version on a shell and you should get an informative message.\nPaste the following into a file called exactly Vagrantfile:\nVagrant.configure(\"2\") do |config| config.vm.box = \"generic/fedora35\" config.vm.provision \"shell\", privileged: false, run: \"always\", inline: \u003c\u003c-SHELL sudo systemctl disable --now firewalld SHELL config.vm.provider \"virtualbox\" do |v| v.customize [\"modifyvm\", :id, \"--memory\", 1024] end config.vm.define \"wg-server\" do |wgs| wgs.vm.hostname = 'wg-server' wgs.vm.network :private_network, ip: \"10.0.123.2\" end config.vm.define \"wg-client\" do |wgc| wgc.vm.hostname = 'wg-client' wgc.vm.network :private_network, ip: \"10.0.123.3\" end end And run vagrant up!\nWhen finished, you should be able to run vagrant ssh wg-server and vagrant ssh wg-client from the same directory.\nImportant caveat: get rid of firewalld By default, Fedora ships with firewalld: that’s something we absolutely do not want for now! We can just stop and disable it with:\n# The --now flag will stop the service too! systemctl disable --now firewalld This is something we need to do on every machine!. You can find more info on this here.\nThat’s it: you’ve got yourself a pair working machines running Fedora 35 :clap:. If you’d rather use a different distribution you can just swap the \"generic/fedora35\" line for whatever you like, such as ubuntu/focal64. You can take a look at the catalog of available images.\nTime to install WireGuard!\nGetting the dragon Even though we’ll walk you through this section, you can always refer to WireGuard’s installation instructions.\nThe good thing with Fedora is it just takes a command to install WireGuard:\n# Time to connect to the server collado@hoth$ vagrant ssh wireguard-server # We're on the server now! Time to install WireGuard [vagrant@wg-server ~]$ sudo dnf install wireguard-tools # You should now log out to get onto the client machine (pst: you can also hit CTRL + D [i.e. ^D]) vagrant@wg-server ~]$ exit # Log into the client... collado@hoth$ vagrant ssh wireguard-client # Time to install WireGuard on the client too! [vagrant@wg-server ~]$ sudo dnf install wireguard-tools Once installed, you’ll interact with WireGuard through two commands:\nwg: Used to set and retrieve the configuration of an interface. wg-quick: Used to quickly (pun intended) set up a WireGuard interface. Did you notice the term interface in the above command descriptions? That’s what’s great about WireGuard: it manifests itself as a simple network interface. That means we can leverage tools such as iptables and interact with it as if it were a regular Ethernet card, for instance.\nIf you want to find more information about them we can query their respective manpages. You can access them locally with man wg and man wg-quick, respectively. You can also find them here.\nOkay, we’ve already got WireGuard installed but… We need to set it up! Time to move on…\nGenerating certificates In order for someone (i.e. a machine) to join the VPN we’ve just set up you’ll need to issue a certificate. These contain the information needed for establishing communication among VPN members.\nPut simply, these certificates provide the information needed by wg and wg-quick when setting up WireGuard on the different machines belonging to the VPN. A certificate for a server looks something like this:\n[Interface] PrivateKey = Address = ",
+  "wordCount" : "3097",
+  "inLanguage": "en",
+  "datePublished": "2022-03-12T00:00:00Z",
+  "dateModified": "2022-03-12T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Pablo Collado Soto"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://pcolladosoto.github.io/posts/wg-setup/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Just another Jedi...",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://pcolladosoto.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://pcolladosoto.github.io/" accesskey="h" title="Just another Jedi... (Alt + H)">Just another Jedi...</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://pcolladosoto.github.io/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://pcolladosoto.github.io/synth/" title="Synth">
+                    <span>Synth</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Setting up a WireGuard VPN
+    </h1>
+    <div class="post-meta"><span title='2022-03-12 00:00:00 +0000 UTC'>12036-03-12</span>&nbsp;·&nbsp;15 min&nbsp;·&nbsp;3097 words&nbsp;·&nbsp;Pablo Collado Soto
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#getting-a-copy-of-fedora-35">Getting a copy of Fedora 35</a>
+      <ul>
+        <li><a href="#important-caveat-get-rid-of-firewalld">Important caveat: get rid of firewalld</a></li>
+      </ul>
+    </li>
+    <li><a href="#getting-the-dragon">Getting the dragon</a></li>
+    <li><a href="#generating-certificates">Generating certificates</a>
+      <ul>
+        <li><a href="#a-bit-on-wireguards-internals">A bit on WireGuard&rsquo;s internals</a></li>
+        <li><a href="#getting-to-port">Getting to port</a></li>
+        <li><a href="#allocating-addresses">Allocating addresses</a></li>
+        <li><a href="#generating-the-keys">Generating the keys</a></li>
+        <li><a href="#the-servers-almost-ready">The server&rsquo;s (almost) ready!</a></li>
+      </ul>
+    </li>
+    <li><a href="#the-clients-certificate">The client&rsquo;s certificate</a></li>
+    <li><a href="#placing-the-certificates-where-they-should-be">Placing the certificates where they should be</a></li>
+    <li><a href="#bringing-the-vpn-up">Bringing the VPN up</a></li>
+    <li><a href="#testing-connectivity">Testing connectivity</a></li>
+    <li><a href="#we-made-it">We made it!</a></li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="so-what-are-vpns-really">So&hellip; what are VPNs really?<a hidden class="anchor" aria-hidden="true" href="#so-what-are-vpns-really">#</a></h1>
+<p>Well, that&rsquo;s not really a straightforward question. Put simply, <em>Virtual Private Networks</em> (that&rsquo;s where VPN comes from :gasp:) allow us to leverage public networks such as the Internet in such a way that those communicating through the VPN really think they&rsquo;re on a real private network: they have no idea their traffic is actually traversing public networks at all!</p>
+<p>Now, this can be accomplished in several ways: we have <a href="https://www.cloudflare.com/en-gb/learning/network-layer/what-is-ipsec/">IPsec</a> and <a href="https://networklessons.com/mpls/mpls-layer-3-vpn-explained">MPLS</a>-based VPNs for instance. At this point it&rsquo;s important to point out a subtle-yet-crucial thing: a VPN is a set of services which can be provided by different technologies. The ones we&rsquo;ve listed just now are two examples of how different technologies can offer VPN-like services. However, MPLS and IPsec couldn&rsquo;t be more apart in terms of what they do and what they are. What&rsquo;s more, different VPN implementations (i.e. technologies) function at different levels of the OSI protocol layer! These breadth of flavours offers a great deal of flexibility: some technologies are better at certain things than others, so choose whatever fits you best.</p>
+<p>In this article we&rsquo;ll turn our attention to another contender jnot listed above: <a href="https://www.wireguard.com">WireGuard</a>. When compared to another known contender in the VPN area (that&rsquo;s no other than <a href="https://openvpn.net">OpenVPN</a>), we find how WireGuard runs <strong>within</strong> the kernel on Linux-based hosts. This provides a level of performance and (maybe more importantly in some scenarios) a huge level of flexibility when it comes to configuration.</p>
+<p>We&rsquo;ll walk you through how to install and deploy a WireGuard-based VPN on <a href="https://getfedora.org">Fedora 35</a>. However, it shouldn&rsquo;t be a massive headache to modulate these steps to other platforms. The most interesting part (at least we think it is) walks you through how to generate certificates for new clients so that you can incorporate anybody you want to to your brand-new and shiny VPN.</p>
+<p>Bear in mind that the certificates we&rsquo;ll be generating <strong>do not</strong> allow clients using them to connect to the Internet. That is, when the VPN is active on a client other than the server you&rsquo;ll not be able to connect to the Internet. In order to work around that you&rsquo;ll need to NAT connections through the server. This is something we discuss on <a href="2022-03-13-wg-access-control.md">this</a> article.</p>
+<p>Strapped in? Let&rsquo;s go!</p>
+<h2 id="getting-a-copy-of-fedora-35">Getting a copy of Fedora 35<a hidden class="anchor" aria-hidden="true" href="#getting-a-copy-of-fedora-35">#</a></h2>
+<p>With the years we&rsquo;ve become quite lazy: once we discovered <a href="https://www.vagrantup.com">Vagrant</a> we kind of stopped looking for ISOs around the Internet. We plan on (at some point) writing about Vagrant where we look a t it a bit more in depth. The good thing is we can get started in a (fairly) straightforward way:</p>
+<ol>
+<li>
+<p>Install <a href="https://www.virtualbox.org">VirtualBox</a> for your OS. If you&rsquo;d rather use a different Virtual Machine (i.e. VM) provider you can do so, but beware about possible hurdles down the road. If you have no idea what a VM provider is, just install VirtualBox and you&rsquo;ll be fine.</p>
+</li>
+<li>
+<p>Follow the installation instructions for your OS <a href="https://www.vagrantup.com/downloads">here</a>.</p>
+</li>
+<li>
+<p>Once Vagrant is up and running you can just run <code>vagrant version</code> on a shell and you should get an informative message.</p>
+</li>
+<li>
+<p>Paste the following into a file called <strong>exactly</strong> <code>Vagrantfile</code>:</p>
+<pre><code> Vagrant.configure(&quot;2&quot;) do |config|
+     config.vm.box = &quot;generic/fedora35&quot;
+     config.vm.provision &quot;shell&quot;, privileged: false, run: &quot;always&quot;, inline: &lt;&lt;-SHELL
+         sudo systemctl disable --now firewalld
+     SHELL
+
+     config.vm.provider &quot;virtualbox&quot; do |v|
+         v.customize [&quot;modifyvm&quot;, :id, &quot;--memory&quot;, 1024]
+     end
+
+     config.vm.define &quot;wg-server&quot; do |wgs|
+         wgs.vm.hostname = 'wg-server'
+         wgs.vm.network :private_network, ip: &quot;10.0.123.2&quot;
+     end
+
+     config.vm.define &quot;wg-client&quot; do |wgc|
+         wgc.vm.hostname = 'wg-client'
+         wgc.vm.network :private_network, ip: &quot;10.0.123.3&quot;
+     end
+ end
+</code></pre>
+</li>
+<li>
+<p>And run <code>vagrant up</code>!</p>
+</li>
+<li>
+<p>When finished, you should be able to run <code>vagrant ssh wg-server</code> and <code>vagrant ssh wg-client</code> from the same directory.</p>
+</li>
+</ol>
+<h3 id="important-caveat-get-rid-of-firewalld">Important caveat: get rid of firewalld<a hidden class="anchor" aria-hidden="true" href="#important-caveat-get-rid-of-firewalld">#</a></h3>
+<p>By default, Fedora ships with <code>firewalld</code>: that&rsquo;s something we absolutely do not want for now! We can just stop and disable it with:</p>
+<pre><code># The --now flag will stop the service too!
+systemctl disable --now firewalld
+</code></pre>
+<p>This is something we need to do on <strong>every machine</strong>!. You can find more info on this <a href="https://unix.stackexchange.com/questions/552857/why-are-my-network-connections-being-rejected">here</a>.</p>
+<p>That&rsquo;s it: you&rsquo;ve got yourself a pair working machines running Fedora 35 :clap:. If you&rsquo;d rather use a different distribution you can just swap the <code>&quot;generic/fedora35&quot;</code> line for whatever you like, such as <code>ubuntu/focal64</code>. You can take a look at the <a href="https://app.vagrantup.com/boxes/search">catalog</a> of available images.</p>
+<p>Time to install WireGuard!</p>
+<h2 id="getting-the-dragon">Getting the dragon<a hidden class="anchor" aria-hidden="true" href="#getting-the-dragon">#</a></h2>
+<p>Even though we&rsquo;ll walk you through this section, you can always refer to <a href="https://www.wireguard.com/install/">WireGuard&rsquo;s installation instructions</a>.</p>
+<p>The good thing with Fedora is it just takes a command to install WireGuard:</p>
+<pre><code># Time to connect to the server
+collado@hoth$ vagrant ssh wireguard-server
+
+# We're on the server now! Time to install WireGuard
+[vagrant@wg-server ~]$ sudo dnf install wireguard-tools
+
+# You should now log out to get onto the client machine (pst: you can also hit CTRL + D [i.e. ^D])
+vagrant@wg-server ~]$ exit
+
+# Log into the client...
+collado@hoth$ vagrant ssh wireguard-client
+
+# Time to install WireGuard on the client too!
+[vagrant@wg-server ~]$ sudo dnf install wireguard-tools
+</code></pre>
+<p>Once installed, you&rsquo;ll interact with WireGuard through two commands:</p>
+<ul>
+<li><code>wg</code>: Used to set and retrieve the configuration of an interface.</li>
+<li><code>wg-quick</code>: Used to quickly (pun intended) set up a WireGuard interface.</li>
+</ul>
+<p>Did you notice the term <em>interface</em> in the above command descriptions? That&rsquo;s what&rsquo;s great about WireGuard: it manifests itself as a simple network interface. That means we can leverage tools such as <code>iptables</code> and interact with it as if it were a regular Ethernet card, for instance.</p>
+<p>If you want to find more information about them we can query their respective manpages. You can access them locally with <code>man wg</code> and <code>man wg-quick</code>, respectively. You can also find them <a href="https://git.zx2c4.com/wireguard-tools/tree/src/man">here</a>.</p>
+<p>Okay, we&rsquo;ve already got WireGuard installed but&hellip; We need to set it up! Time to move on&hellip;</p>
+<h2 id="generating-certificates">Generating certificates<a hidden class="anchor" aria-hidden="true" href="#generating-certificates">#</a></h2>
+<p>In order for someone (i.e. a machine) to join the VPN we&rsquo;ve just set up you&rsquo;ll need to issue a certificate. These contain the information needed for establishing communication among VPN members.</p>
+<p>Put simply, these certificates provide the information needed by <code>wg</code> and <code>wg-quick</code> when setting up WireGuard on the different machines belonging to the VPN. A certificate for a server looks something like this:</p>
+<pre><code>[Interface]
+PrivateKey = &lt;server-private-key&gt;
+Address = &lt;server's-address-in-the-VPN&gt;
+ListenPort = &lt;VPN-server-port&gt;
+
+# Client A
+[Peer]
+PublicKey = &lt;client-public-key&gt;
+PresharedKey = &lt;peer-symmetric-key&gt;
+AllowedIPs = &lt;client's-address-in-the-VPN&gt;
+
+# Client B
+[Peer]
+PublicKey = &lt;client-public-key&gt;
+PresharedKey = &lt;peer-symmetric-key&gt;
+AllowedIPs = &lt;client's-address-in-the-VPN&gt;
+
+# Other clients go below...
+</code></pre>
+<p>The above contains quite a lot of blanks right? Let&rsquo;s take a step back to understand what we need to fill them with.</p>
+<h3 id="a-bit-on-wireguards-internals">A bit on WireGuard&rsquo;s internals<a hidden class="anchor" aria-hidden="true" href="#a-bit-on-wireguards-internals">#</a></h3>
+<p>WireGuard is a Layer 3 (i.e. network layer) VPN implementation. This means that IP datagrams are encapsulated and sent over a public network. On the wire, a WireGuard packet looks something like:</p>
+<pre><code>+ -------- + &lt;-- +
+|   HTTP   |     |  --&gt; This could be any other protocol!
++ -------- +     |
+|   TCP    |     | WireGuard Packet
++ -------- +     |
+|    IP    |     |
++ -------- + &lt;-- +
+|   UDP    | --&gt; This datagram's destination port is the VPN's port!
++ -------- +
+|    IP    | --&gt; This datagram's destination address is the VPN server!
++ -------- +
+| Ethernet | --&gt; This could also be WiFi or whatever you like!
++ -------- +
+</code></pre>
+<p>Keep this in mind when we walk through the pieces of data we need to configure the server. This high-level overview will often come in handy!</p>
+<p>By the way, you can check the above by using <a href="https://www.wireshark.org">WireShark</a> and capturing traffic both on your <em>real</em> interface (i.e. your WiFi or Ethernet card) and then on the WireGuard interface and comparing the two.</p>
+<h3 id="getting-to-port">Getting to port<a hidden class="anchor" aria-hidden="true" href="#getting-to-port">#</a></h3>
+<p>We encounter the first piece of data we need: the server&rsquo;s port and address. Like in any other occasion, the address identifies the VPN host (i.e. the machine) and the port identifies the process (i.e. the port WireGuard listens on). The servers address depends on its network configuration. Ideally, this would be a static, public address. For us it&rsquo;s going to be <code>10.0.123.2</code>, as seen on the <code>Vagrantfile</code>. You can also run <code>ip a</code> on the server machine and check the output :eyes:. The port is specified on the server&rsquo;s certificate: that&rsquo;s what you need to include on the <code>ListenPort</code> parameter. You&rsquo;ll usually see people using port <code>51820</code> and, as we&rsquo;re not smarter than anybody we&rsquo;ll stick to the tradition.</p>
+<h3 id="allocating-addresses">Allocating addresses<a hidden class="anchor" aria-hidden="true" href="#allocating-addresses">#</a></h3>
+<p>Next up we can decide on the addresses we&rsquo;ll internally use on the VPN. These are the exact equivalent to the one&rsquo;s you use at home (unless you&rsquo;ve migrated to IPv6 that is). You <strong>should</strong> choose a private range that doesn&rsquo;t collided with the private ranges your machines will belong to. In other words, if your home&rsquo;s network is <code>192.68.1.0/24</code>, you could use addresses on the <code>192.168.2.0/24</code> block, for instance. If you decide to use addresses on the <code>192.168.1.0/24</code> block for the VPN too you&rsquo;ll encounter all sorts of networking problems, so&hellip; good luck!</p>
+<p>Please note we&rsquo;ll be using <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">CIDR notation</a> to describe network address allocation. We&rsquo;d also like to remind you what the private IPv4 ranges are (check <a href="https://www.arin.net/reference/research/statistics/address_filters/">ARIN</a> if you don&rsquo;t believe us :wink:): <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code> and <code>192.168.0.0/16</code>.</p>
+<p>We live in Spain and tradition has it that local networks use the <code>192.168.1.0/24</code> block. To shake things up a bit we&rsquo;ll allocate addresses within the <code>10.1.2.0/24</code> block. Thus, the server&rsquo;s address will be <code>10.1.2.1/24</code>. Note we need to include the netmask (i.e. <code>/24</code>) in the configuration so that WireGuard knows addresses <code>10.1.2.1</code> through <code>10.1.2.255</code> belong the the VPN.</p>
+<p>We&rsquo;ll also move things along and allocate address <code>10.1.2.2</code> to the client. After all, we also need it to complete the server&rsquo;s certificate!</p>
+<h3 id="generating-the-keys">Generating the keys<a hidden class="anchor" aria-hidden="true" href="#generating-the-keys">#</a></h3>
+<p>Pretty much like SSH, WireGuard leverages asymmetric key cryptography to establish connections among VPN peers. Luckily for us, the <code>wg</code> utility can generate these for us. When generating keys and copying them around be sure to reset your shell&rsquo;s history afterwards: you don&rsquo;t want your keys lingering around there!</p>
+<p>One more thing: <strong>do not use these keys yourself</strong>. They&rsquo;re just an example and they&rsquo;re suitable for testing stuff out, but don&rsquo;t use them in a production setting. What&rsquo;s more, when you run <code>wg genkey</code> and the like you <strong>will get different keys</strong>. You just need to carry out the same steps as us and you&rsquo;ll be good to go.</p>
+<p>Without further ado, let&rsquo;s generate all the keys we need for the server:</p>
+<pre><code># Let's generate a private key.
+    # This is what must be provided to the PrivateKey parameter.
+[vagrant@wg-server ~]$ wg genkey
+qK+FDQO9P1e2Th85sn5nq8Nrs3iOY2ZAowip7kHWd0k=
+
+# And let's find out the corresponding public key.
+    # This is what we'll need to specify on the client certificates later on
+[vagrant@wg-server ~]$ echo 'qK+FDQO9P1e2Th85sn5nq8Nrs3iOY2ZAowip7kHWd0k=' | wg pubkey
+FqjHP1a0MFGrI6j3Xj7Zn2ffxPC6fLFc8ZJu6tHW52Y=
+
+# We can also chain the two with `tee` and process substitution.
+    # This messes up the output though...
+[vagrant@wg-server ~]$ wg genkey | tee &gt;(wg pubkey)
+qK+FDQO9P1e2Th85sn5nq8Nrs3iOY2ZAowip7kHWd0k=
+[vagrant@wg-server ~]$ FqjHP1a0MFGrI6j3Xj7Zn2ffxPC6fLFc8ZJu6tHW52Y=
+</code></pre>
+<p>On top of asymmetric keys we can also generate a symmetric one:</p>
+<pre><code>[vagrant@wg-server ~]$ wg genpsk
+8B+kRNDGnBVIm77tpVCt0D0RbBPWuzX2GJ1T8Slo+2I=
+</code></pre>
+<p>This key <strong>must</strong> be included on the corresponding peer configuration on the server. In other words, we&rsquo;ll need to generate a symmetric key <strong>for each</strong> client if we decide to use them. We can also have just some clients using them. These provide (as per the <code>wg</code> manpage) <em>post-quantum resistance</em>.</p>
+<p>After getting the keys straight, we&rsquo;re ready to configure the server!</p>
+<h3 id="the-servers-almost-ready">The server&rsquo;s (almost) ready!<a hidden class="anchor" aria-hidden="true" href="#the-servers-almost-ready">#</a></h3>
+<p>After all the above, we find how the server&rsquo;s configuration is:</p>
+<pre><code>[Interface]
+PrivateKey = qK+FDQO9P1e2Th85sn5nq8Nrs3iOY2ZAowip7kHWd0k=
+Address = 10.1.2.1/24
+ListenPort = 51820
+
+# Client A
+[Peer]
+PublicKey = &lt;client-public-key&gt;
+PresharedKey = 8B+kRNDGnBVIm77tpVCt0D0RbBPWuzX2GJ1T8Slo+2I=
+AllowedIPs = 10.1.2.2/32
+</code></pre>
+<p>Did you notice the <code>/32</code> mask on the <code>AllowedIPs</code> parameter? This roughly means that only packets addressed to <code>10.1.2.2</code> (and only that!) will be relayed to the client. This is, in a way, WireGuard&rsquo;s routing table. This is only scratching WireGuard&rsquo;s possibilities, so we encourage to take a look at <a href="https://www.wireguard.com">WireGuard&rsquo;s homepage</a> and it&rsquo;s <a href="https://www.wireguard.com/papers/wireguard.pdf">technical paper</a>.</p>
+<h4 id="enabling-ipv4-forwarding">Enabling IPv4 forwarding<a hidden class="anchor" aria-hidden="true" href="#enabling-ipv4-forwarding">#</a></h4>
+<p>Due to how the server will be managing traffic we need to enable IPv4 forwarding on it. This can be easily accomplished with:</p>
+<pre><code>sudo sysctl -w net.ipv4.ip_forward=1
+</code></pre>
+<p>Now the server will be able to move packets across interfaces.</p>
+<p>We&rsquo;re still missing something :scream:. We won&rsquo;t know the client&rsquo;s public key until we generate the private one so&hellip; let&rsquo;s get on that!</p>
+<h2 id="the-clients-certificate">The client&rsquo;s certificate<a hidden class="anchor" aria-hidden="true" href="#the-clients-certificate">#</a></h2>
+<p>A client certificate looks something like:</p>
+<pre><code>[Interface]
+PrivateKey = &lt;client-private-key&gt;
+Address = &lt;client's-address-in-the-VPN&gt;
+
+[Peer]
+Endpoint = &lt;VPN-server-ip&gt;:&lt;VPN-server-port&gt;
+PublicKey = &lt;server-public-key&gt;
+PresharedKey = &lt;peer-symmetric-key&gt;
+AllowedIPs = 0.0.0.0/0
+</code></pre>
+<p>Just like before, the <code>AllowedIPs</code> field control what&rsquo;s routed through the VPN on the client. The special <code>0.0.0.0/0</code> address means <strong>everything</strong>. We could, however, include a comma-separated list of CIDR networks if we wanted to be more specific. If that&rsquo;s the path you want to take make sure the server&rsquo;s real IP address (i.e. <code>10.0.123.2</code> for us) <strong>is not</strong> routed through the VPN: if it is you&rsquo;ll create a routing loop and break connectivity&hellip; Without getting into too much detail, using the <code>0.0.0.0/0</code> wildcard routes stuff according to an identifier instead of &rsquo;traditional&rsquo; routes. If you use &lsquo;real&rsquo; CIDR networks this won&rsquo;t be the case and that opens up this possible pitfall :sweat:.</p>
+<p>Given what we saw before we only need to generate the private and public keys to fill in the holes! Just like before:</p>
+<pre><code># Private key generation
+[vagrant@wg-client ~]$ wg genkey
+UA36Uq7UN0joXIXAPMaSaezyq6d9oKn6t9aACEDCpmI=
+
+# Public key time!
+[vagrant@wg-client ~]$ echo 'UA36Uq7UN0joXIXAPMaSaezyq6d9oKn6t9aACEDCpmI=' | wg pubkey
+OkCW9JriehL1JWjQ8tS1DVEPs4ZscuJd5MafOezWWkE=
+</code></pre>
+<p>Then, the client certificate becomes:</p>
+<pre><code>[Interface]
+PrivateKey = UA36Uq7UN0joXIXAPMaSaezyq6d9oKn6t9aACEDCpmI=
+Address = 10.1.2.2/24
+
+[Peer]
+Endpoint = 10.0.123.2:51820
+PublicKey = FqjHP1a0MFGrI6j3Xj7Zn2ffxPC6fLFc8ZJu6tHW52Y=
+PresharedKey = 8B+kRNDGnBVIm77tpVCt0D0RbBPWuzX2GJ1T8Slo+2I=
+AllowedIPs = 0.0.0.0/0
+</code></pre>
+<p>And the server&rsquo;s would be:</p>
+<pre><code>[Interface]
+PrivateKey = qK+FDQO9P1e2Th85sn5nq8Nrs3iOY2ZAowip7kHWd0k=
+Address = 10.1.2.1/24
+ListenPort = 51820
+
+# Client A
+[Peer]
+PublicKey = OkCW9JriehL1JWjQ8tS1DVEPs4ZscuJd5MafOezWWkE=
+PresharedKey = 8B+kRNDGnBVIm77tpVCt0D0RbBPWuzX2GJ1T8Slo+2I=
+AllowedIPs = 10.1.2.2/32
+</code></pre>
+<h2 id="placing-the-certificates-where-they-should-be">Placing the certificates where they should be<a hidden class="anchor" aria-hidden="true" href="#placing-the-certificates-where-they-should-be">#</a></h2>
+<p>When interfaces are brought up with <code>wg-quick</code>, the tool looks for configuration files on <code>/etc/wireguard</code> following the <code>*.conf</code> syntax. Note the leading <code>*</code> determines the name of the generated interface! What&rsquo;s more, this name is only taken into account within the server itself: two VPN members can have the same interface name.</p>
+<p>Let&rsquo;s leverage <a href="https://tldp.org/LDP/abs/html/here-docs.html">here docs</a> to write the files into the appropriate locations:</p>
+<pre><code># Let's make sure the necessary directories exist
+[vagrant@wg-server ~]$ mkdir -p /etc/wireguard
+[vagrant@wg-client ~]$ mkdir -p /etc/wireguard
+
+# Configure the appropriate permissions
+[vagrant@wg-server ~]$ chmod 0700 /etc/wireguard
+[vagrant@wg-client ~]$ chmod 0700 /etc/wireguard
+
+# Write the file on the server!
+    # You can also use `nano` or `vim`: if not copied exactly the
+    # following may fail due to whitespace...
+[vagrant@wg-server ~]$ sudo bash -c 'cat &lt;&lt;-EOF &gt; /etc/wireguard/wg0.conf
+[Interface]
+PrivateKey = qK+FDQO9P1e2Th85sn5nq8Nrs3iOY2ZAowip7kHWd0k=
+Address = 10.1.2.1/24
+ListenPort = 51820
+
+# Client A
+[Peer]
+PublicKey = OkCW9JriehL1JWjQ8tS1DVEPs4ZscuJd5MafOezWWkE=
+PresharedKey = 8B+kRNDGnBVIm77tpVCt0D0RbBPWuzX2GJ1T8Slo+2I=
+AllowedIPs = 10.1.2.2/32
+EOF'
+
+# Configure the permissions for the file too! Better safe than sorry...
+[vagrant@wg-server ~]$ chmod 0600 /etc/wireguard/wg0.conf
+
+# Time to copy the certificate to the client too!
+[vagrant@wg-client ~]$ sudo bash -c 'cat &lt;&lt;-EOF &gt; /etc/wireguard/wg0.conf
+[Interface]
+PrivateKey = UA36Uq7UN0joXIXAPMaSaezyq6d9oKn6t9aACEDCpmI=
+Address = 10.1.2.2/24
+
+[Peer]
+Endpoint = 10.0.123.2:51820
+PublicKey = FqjHP1a0MFGrI6j3Xj7Zn2ffxPC6fLFc8ZJu6tHW52Y=
+PresharedKey = 8B+kRNDGnBVIm77tpVCt0D0RbBPWuzX2GJ1T8Slo+2I=
+AllowedIPs = 0.0.0.0/0
+EOF'
+
+# And set permissions once again
+[vagrant@wg-client ~]$ chmod 0600 /etc/wireguard/wg0.conf
+</code></pre>
+<h2 id="bringing-the-vpn-up">Bringing the VPN up<a hidden class="anchor" aria-hidden="true" href="#bringing-the-vpn-up">#</a></h2>
+<p>With everything ready, our VPN is just a command away (okay, two, one on each host :grimacing:) from working!</p>
+<p>We&rsquo;ll use <code>wg-quick</code> to bring the interfaces up. Given the certificates have been saved to <code>/etc/wireguard/wg0.conf</code> on both machines the command will be exactly the same:</p>
+<pre><code># Bringing the VPN up on the server
+[vagrant@wg-server ~]$ sudo wg-quick up wg0
+[#] ip link add wg0 type wireguard
+[#] wg setconf wg0 /dev/fd/63
+[#] ip -4 address add 10.1.2.1/24 dev wg0
+[#] ip link set mtu 1420 up dev wg0
+
+# And now on the client
+[vagrant@wg-client ~]$ sudo wg-quick up wg0
+[#] ip link add wg0 type wireguard
+[#] wg setconf wg0 /dev/fd/63
+[#] ip -4 address add 10.1.2.2/24 dev wg0
+[#] ip link set mtu 1420 up dev wg0
+[#] wg set wg0 fwmark 51820
+[#] ip -4 route add 0.0.0.0/0 dev wg0 table 51820
+[#] ip -4 rule add not fwmark 51820 table 51820
+[#] ip -4 rule add table main suppress_prefixlength 0
+[#] sysctl -q net.ipv4.conf.all.src_valid_mark=1
+[#] nft -f /dev/fd/63
+</code></pre>
+<p>We can now use <code>wg</code> to check the VPN&rsquo;s state on each machine:</p>
+<pre><code>[vagrant@wg-server ~]$ sudo wg
+interface: wg0
+    public key: FqjHP1a0MFGrI6j3Xj7Zn2ffxPC6fLFc8ZJu6tHW52Y=
+    private key: (hidden)
+    listening port: 51820
+
+peer: OkCW9JriehL1JWjQ8tS1DVEPs4ZscuJd5MafOezWWkE=
+    preshared key: (hidden)
+    endpoint: 10.0.123.3:55912
+    allowed ips: 10.1.2.2/32
+    latest handshake: 40 seconds ago
+    transfer: 17.29 KiB received, 16.86 KiB sent
+
+[vagrant@wg-client ~]$ sudo wg
+interface: wg0
+    public key: OkCW9JriehL1JWjQ8tS1DVEPs4ZscuJd5MafOezWWkE=
+    private key: (hidden)
+    listening port: 55912
+    fwmark: 0xca6c
+
+peer: FqjHP1a0MFGrI6j3Xj7Zn2ffxPC6fLFc8ZJu6tHW52Y=
+    preshared key: (hidden)
+    endpoint: 10.0.123.2:51820
+    allowed ips: 0.0.0.0/0
+    latest handshake: 43 seconds ago
+    transfer: 16.86 KiB received, 23.80 KiB sent
+</code></pre>
+<p>As you might&rsquo;ve guessed, you can use <code>wg-quick down wg0</code> on any machine to dismantle the VPN. Way to go! Time for a pat in the back :clap:</p>
+<h2 id="testing-connectivity">Testing connectivity<a hidden class="anchor" aria-hidden="true" href="#testing-connectivity">#</a></h2>
+<p>Once stuff is up and running we can test out the connectivity between the machines by running the following command:</p>
+<pre><code># Pinging the client from the server
+[vagrant@wg-server ~]$ ping -c 3 10.1.2.2
+PING 10.1.2.2 (10.1.2.2) 56(84) bytes of data.
+64 bytes from 10.1.2.2: icmp_seq=1 ttl=64 time=0.942 ms
+64 bytes from 10.1.2.2: icmp_seq=2 ttl=64 time=0.875 ms
+64 bytes from 10.1.2.2: icmp_seq=3 ttl=64 time=0.874 ms
+
+--- 10.1.2.2 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2045ms
+rtt min/avg/max/mdev = 0.874/0.897/0.942/0.031 ms
+
+# Pinging the client from the server
+[vagrant@wg-client ~]$ ping -c 3 10.1.2.1
+PING 10.1.2.1 (10.1.2.1) 56(84) bytes of data.
+64 bytes from 10.1.2.1: icmp_seq=1 ttl=64 time=0.901 ms
+64 bytes from 10.1.2.1: icmp_seq=2 ttl=64 time=1.30 ms
+64 bytes from 10.1.2.1: icmp_seq=3 ttl=64 time=0.852 ms
+
+--- 10.1.2.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2007ms
+rtt min/avg/max/mdev = 0.852/1.017/1.298/0.199 ms
+</code></pre>
+<p>That&rsquo;s it! We have connectivity between both machines!</p>
+<h2 id="we-made-it">We made it!<a hidden class="anchor" aria-hidden="true" href="#we-made-it">#</a></h2>
+<p>Well, that was quite a ride! You can now follow the same procedure we used for the client to add as many (well, you can only add <code>252</code> other machines) new clients as you want and communicate among them as if they all belonged to a private net wit addresses in the <code>10.1.2.0/24</code> range.</p>
+<p>We plan on writing another article extending this one where we show how you can leverage <code>iptables</code> rules and such to filter traffic based on its origin and some other goodies. Before that, you should however feel comfortable with all the ground we&rsquo;ve covered to fully grasp new and more interesting concepts.</p>
+<hr>
+<p>If you have any comments, questions or suggestions, feel free to drop me an email!</p>
+<p>Thanks for your time! Hope you found this useful :smile_cat:</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://pcolladosoto.github.io/tags/networking/">networking</a></li>
+      <li><a href="https://pcolladosoto.github.io/tags/wireguard/">wireguard</a></li>
+      <li><a href="https://pcolladosoto.github.io/tags/vpn/">vpn</a></li>
+    </ul>
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Setting up a WireGuard VPN on twitter"
+        href="https://twitter.com/intent/tweet/?text=Setting%20up%20a%20WireGuard%20VPN&amp;url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fwg-setup%2f&amp;hashtags=networking%2cwireguard%2cvpn">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Setting up a WireGuard VPN on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fwg-setup%2f&amp;title=Setting%20up%20a%20WireGuard%20VPN&amp;summary=Setting%20up%20a%20WireGuard%20VPN&amp;source=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fwg-setup%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Setting up a WireGuard VPN on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fwg-setup%2f&title=Setting%20up%20a%20WireGuard%20VPN">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Setting up a WireGuard VPN on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fwg-setup%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Setting up a WireGuard VPN on whatsapp"
+        href="https://api.whatsapp.com/send?text=Setting%20up%20a%20WireGuard%20VPN%20-%20https%3a%2f%2fpcolladosoto.github.io%2fposts%2fwg-setup%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Setting up a WireGuard VPN on telegram"
+        href="https://telegram.me/share/url?text=Setting%20up%20a%20WireGuard%20VPN&amp;url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fwg-setup%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://pcolladosoto.github.io/">Just another Jedi...</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -57,7 +57,7 @@ params:
 
   # Date format specification. Check https://gohugo.io/functions/format/
   # for more info on it!
-  DateFormat: "02/01/2016"
+  DateFormat: "2016-01-02"
 
   # Let the user's config choose the theme style...
   defaultTheme: "auto"

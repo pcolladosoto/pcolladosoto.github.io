@@ -1,7 +1,7 @@
 ---
 title: "Cross Compiling stuff with Docker"
 tags: ["cross-compilation", "docker"]
-date: 2023-05-08
+date: "2021-11-14"
 ---
 
 # Do we really have to compile stuff in the 21st century?

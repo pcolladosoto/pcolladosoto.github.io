@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>An introduction to subnetting in IP networks | Just another Jedi...</title>
+<meta name="keywords" content="networking-fundamentals, IPv4, IPv6">
+<meta name="description" content="What was an IP again? Let&rsquo;s start at the &lsquo;beginning&rsquo;. When computers communicate among themselves they need to refer to other parties involved in the communication in some way or another. In the context of today&rsquo;s Internet, machines identify themselves through IP addresses.
+Notice how the entire article is named &lsquo;What was an IP again?&rsquo;. That is purposefully incorrect. In order to understand why, we need to take a (small) step back and briefly visit the OSI Model.">
+<meta name="author" content="Pablo Collado Soto">
+<link rel="canonical" href="https://pcolladosoto.github.io/posts/ip-subnetting/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a86159a73db327948c7febaf1826dc57ee82eaaa0ad85d7e32ef3abb8c655650.css" integrity="sha256-qGFZpz2zJ5SMf&#43;uvGCbcV&#43;6C6qoK2F1&#43;Mu86u4xlVlA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://pcolladosoto.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://pcolladosoto.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://pcolladosoto.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://pcolladosoto.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://pcolladosoto.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="An introduction to subnetting in IP networks" />
+<meta property="og:description" content="What was an IP again? Let&rsquo;s start at the &lsquo;beginning&rsquo;. When computers communicate among themselves they need to refer to other parties involved in the communication in some way or another. In the context of today&rsquo;s Internet, machines identify themselves through IP addresses.
+Notice how the entire article is named &lsquo;What was an IP again?&rsquo;. That is purposefully incorrect. In order to understand why, we need to take a (small) step back and briefly visit the OSI Model." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://pcolladosoto.github.io/posts/ip-subnetting/" /><meta property="og:image" content="https://pcolladosoto.github.io/me.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-12-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-12-16T00:00:00+00:00" /><meta property="og:site_name" content="Just another Jedi..." />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://pcolladosoto.github.io/me.png"/>
+
+<meta name="twitter:title" content="An introduction to subnetting in IP networks"/>
+<meta name="twitter:description" content="What was an IP again? Let&rsquo;s start at the &lsquo;beginning&rsquo;. When computers communicate among themselves they need to refer to other parties involved in the communication in some way or another. In the context of today&rsquo;s Internet, machines identify themselves through IP addresses.
+Notice how the entire article is named &lsquo;What was an IP again?&rsquo;. That is purposefully incorrect. In order to understand why, we need to take a (small) step back and briefly visit the OSI Model."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://pcolladosoto.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "An introduction to subnetting in IP networks",
+      "item": "https://pcolladosoto.github.io/posts/ip-subnetting/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "An introduction to subnetting in IP networks",
+  "name": "An introduction to subnetting in IP networks",
+  "description": "What was an IP again? Let\u0026rsquo;s start at the \u0026lsquo;beginning\u0026rsquo;. When computers communicate among themselves they need to refer to other parties involved in the communication in some way or another. In the context of today\u0026rsquo;s Internet, machines identify themselves through IP addresses.\nNotice how the entire article is named \u0026lsquo;What was an IP again?\u0026rsquo;. That is purposefully incorrect. In order to understand why, we need to take a (small) step back and briefly visit the OSI Model.",
+  "keywords": [
+    "networking-fundamentals", "IPv4", "IPv6"
+  ],
+  "articleBody": "What was an IP again? Let’s start at the ‘beginning’. When computers communicate among themselves they need to refer to other parties involved in the communication in some way or another. In the context of today’s Internet, machines identify themselves through IP addresses.\nNotice how the entire article is named ‘What was an IP again?’. That is purposefully incorrect. In order to understand why, we need to take a (small) step back and briefly visit the OSI Model.\nA quick look at the OSI Model When approaching any topic in networking, it’s usually a good idea to have a conceptual grasp of whatever it is we are up against. At a lowish level, that usually implies thinking about where the topic at hand fits within the layers defined in the OSI model. For our purposes, we will only focus on the network layer (i.e. layer 3) of said model: a full blown description of OSI is well beyond the scope of this article.\nIf, on the other hand, you feel more inclined towards the TCP/IP model of networks, this discussion would them belong within the internet layer. A good comparison of both models can be found here.\nIn any case, we should that what we identify at layer 3 (i.e. L3) are hosts, or more precisely, network interfaces. For our discussion of subnetting we can safely assume a host has a single network interface, but that might not always be the case (I’m looking at you, routers). That is, L3 identifiers refer to hosts.\nAfter all this nonsense, we can finally see why saying ‘machine A has IP X.Y.Z.K’ is wrong: IP is the L3 protocol, what a machine ‘has’ is an IP address. You can read up more (quite a lot more actually) on IP on its RFC.\nAs a fun fact, we would like to mention that there are indeed some other L3 protocols besides IP. An example of that would be X.25. Things here get a bit messy, as X.25 predates the OSI model, which is why X.25 should be regarded more as a protocol suite that includes a L3 protocol on its packet layer. Even though IP has pretty much conquered the world in terms of extension and usage, we shouldn’t forget some other options exist. We even have circuit-switched instead of packet-switched networks too! That’s a story for another time though…\nBut then, what’s an IP address? Now that we know the ‘correct’ term when referring to addresses, we can discuss what they really are: just a 32-bit number. Pretty anticlimactic right? However, this makes it very easy to conceptually work with IP: we can establish a number-to-machine correspondence when we think about how messages are addressed to a computer.\nWe humans are clumsy machines. Thus, making us work with these 32-bit addresses in a binary format is a recipe for disaster. That’s the reason why you will almost never see an IP address as something like this:\n10101001011010010100001010101010 Imagine a machine you just configured can’t be contacted: can you be sure you didn’t mess up one of those 1s and 0s? In order to make these addresses more wieldy, we break them up into bytes and then present each of those bytes as a base 10 number. Why base 10 numbers? They are the ones we use every day! This makes it a bit more ‘familiar’ to work with addresses. The following shows how we can get a ‘raw’ address in binary and then transform it into a familiar IP address:\n# This is our initial raw address 11000000101010000000000100000001 # Let's add a space between each byte to make it easier to work with 11000000 10101000 00000001 00000001 # Time to transform them to decimal. We'll do it a byte at a time. # Note the `d` suffix on base 10 numbers and the `b` suffix on binary numbers. # Note `a * b` is to be read as 'a times b'. # Note `a^b` is to be read as 'a to the power of b'. # ByteA 11000000b = 1 * 2^7 + 1 * 2^6 + 0 * 2^5 + 0 * 2^4 + 0 * 2^3 + 0 * 2^2 + 0 * 2^1 + 0 * 2^0 = 192d # ByteB 10101000b = 1 * 2^7 + 0 * 2^6 + 1 * 2^5 + 0 * 2^4 + 1 * 2^3 + 0 * 2^2 + 0 * 2^1 + 0 * 2^0 = 168d # ByteC 00000001b = 0 * 2^7 + 0 * 2^6 + 0 * 2^5 + 0 * 2^4 + 0 * 2^3 + 0 * 2^2 + 0 * 2^1 + 1 * 2^0 = 1d # ByteD 00000001b = 0 * 2^7 + 0 * 2^6 + 0 * 2^5 + 0 * 2^4 + 0 * 2^3 + 0 * 2^2 + 0 * 2^1 + 1 * 2^0 = 1d # Then, our resulting IP address in the familiar format would be: 11000000101010000000000100000001 -\u003e ByteA.ByteB.ByteC.ByteD -\u003e 192.168.1.1 Even though the above is nice for illustrative purposes, it’s something we usually find tiring and error prone. Besides, it requires knowledge of representation systems such as binary… That’s why people usually resort to calculators that do this out of the box. A good example would be this one. If you’re into Python, you can also take a look at a (very simple) library we made: iptool. These transformations are something you won’t need on a daily basis. However, knowing what IP addresses are is crucial for understanding what subnets are and how they work.\nIf you had no idea about what was going on in the snippet above, be sure to check this site for a quick introduction on what binary numbers are and how they work.\nThings to note After learning how we can build a familiar representation of an IP address from the real thing, we can see how:\nWe can generate 2^32 = 4294967296 unique address ranging from 0 to 2^32 - 1 = 4294967295. Given each Internet-capable device should have its own, unique address, the number is not that large. This is one of the aspects that motivated the appearance and proliferation of NATs.\nEach of the octets in an address will be a number between 0 and 255. This follows from the fact that a byte’s value belongs to the [0, 2^8 - 1] = [0, 255] interval. Thus, we can be sure that 278.16.1.5 is not a valid address. This ‘rule of thumb’ is crucial when it comes to spotting errors in network configurations.\nWhat’s the difference between IPv4 and IPv6? We actually have a better question: what happened to IPv5? The real answer is it never became an official protocol. It was mainly geared towards streaming and real-time applications such as VoIP. Given it used 32-bit addresses it suffered from the same problems than IPv4 and so it was never standardized. You can read (a bit) more on that here.\nJokes aside, we haven’t been completely honest with you :scream:. Like many things in the realm of computing, the IP protocol comes in several versions. Up to now we have been dealing with the ‘standard’ version: IPv4. The thing is, IPv4 was designed at a time where few people could’ve predicted the adoption the Internet was going to have. After all, networks were born within a military context as a project for the Defense Advanced Research Projects Agency (i.e. DARPA). Once it was made available to general users some design problems became more noticeable, the most obvious being the shortage of available addresses.\nThen, on 1995, the original IPv6 RFC is published. Many people (myself included for quite some time) deem IPv6 as ‘IPv4 with longer addresses’. However, this approach just misses quite a lot of what IPv6 brings to the table: Link Local Addresses, Unique Local Addresses, restricted datagram fragmentation… You can read more on that here, here and there. You might also want to take a look at the current IPv6 RFC. RFC 4864 also offers some very good insight into controversial topics such as why NAT doesn’t really add security, something IPv4 supporters usually claim when deciding not migrate to IPv6.\nThis is not a discussion on IPv6 or a comparison between that and IPv4: we are concerned with subnets and things of that nature. The good thing is the general idea translates seamlessly from IPv4 to IPv6, so the ensuing discussion is applicable to both realms. The most noticeable difference is that IPv6 addresses are 128 bits long instead of 32. That means, we have 2^128 = 3,402823669209385 * 10^38 unique IPv6 addresses: looks like we won’t need NAT at all!\nRepresenting IPv6 addresses Just like with IPv4, at the end of the day an IPv6 address is a 128 bit integer. However, you’ll see them expressed as hexadecimal numbers: they are much more wieldy than base 10 numbers! There are some other differences too:\nThe address is ‘broken up’ into 16-bit chunks. Given a hex digit can represent the sames quantities as 4 bits, each 16-bit chunk is translated into 4 hex digits. If this sounds alien-y to you, be sure to take a look at this intro. You can also look for ‘intro to hex numbers’ in a search engine of your choice. We really like DuckDuckGo though :ok_woman:\nThe 16-bit chunks are separated by colons (i.e. :).\nIf several consecutive 16-bit chunks are all zeros (i.e. 0) you can summarize them with two consecutive colons (i.e. ::). You can only use this once!\nYou can drop leading zeros in a chunk (i.e. 0ABC can be written as ABC).\nWith these rules we find how the following are valid IPv6 addresses:\n2345:425:2ca1::567:5673:23b5 (this would be equivalent to 2345:0425:2ca1:0000:0000:0567:5673:23b5) 2607:f0d0:1002:51::4 (this would be equivalent to 2607:f0d0:1002:0051:0000:0000:0000:0004) Thinks to know and fun facts Given the natural relation between binary and hex numbers, note we cannot write an IPv6 address that’s ’too big’ as long as we only use valid hex digits (i.e. 0123456789ABCD) and just 4 of them. In other words, we cannot generate addresses that are wrong but that ’look okay’ like 800.433.312.257. It has just as many digits as 192.168.160.180, but the former is completely wrong!\nA good thing to know is that, if you want to explicitly use an address in applications such as browsers you need to enclose them with square brackets (i.e. []). To understand why this is needed think about contacting a web server on a non-default port (i.e. 80 for HTTP and 443 for HTTPS). You would write something like the following in the search bar:\nhttp://129.168.1.5:8080 Now, if instead of an IPv4 address you use an IPv6 one you would write:\nhttp://2607:f0d0:1002:51::4:8080 How can the browser tell the port number (i.e. 8080) apart from the address? They are both delimited through colons… Even though some rather complex logic could work things out, it’s easier to just ‘guard’ the address with a well known character. That way, the browser (or any application) can quickly extract the address and begin sending stuff. Thus, the following is what you should write to contact that same process:\nhttp://[2607:f0d0:1002:51::4]:8080 Who manages this? Now we have been introduced to IPv4 and IPv6 addresses. Time for a pat in the back! :clap:\nManaging all these addresses comes with quite a lot of organizational overhead. Even though it’s not the topic of this article, we would like to mention that addresses are manged by several organizations (Regional Internet Registrars) that are geographically distributed:\nGeographical Area RIR Website Europe RIPE https://www.ripe.net/ Asia \u0026 Pacific APNIC https://www.apnic.net Africa AFRINIC https://www.afrinic.net Latin America LACNIC https://www.lacnic.net North America ARIN https://www.arin.net This doesn’t really concern us, but the sites are a great information source and I find this type of thing quite interesting :woman_shrugging:\nTime for subnets! Now it’s time to picture ourselves as network administrators… How would we go about managing a corporate network or even a home network? Should we manage addresses as a bunch of loose identifiers with no relation whatsoever? As you might have guessed, that’s not how stuff works!\nSimply put, subnets are logical divisions of the IP address space. Now, that sounds like some new-age mumbo jumbo right? It’s often said that the Internet is a network of networks. It’s something most of us repeat like a mantra but… what does it mean?\nMany of us have never worked with networks detached from the Internet. The common use case of a home LAN (Local Area Network) is often (if not always) equipped with an Internet-capable connection. The thing is, this network could be completely isolated from the Internet and still be very useful. We could access local services like, for instance, a Minecraft server running on a machine plugged into our home router. We can now begin to see how LANs are networks in their own right. It just so happens that we decide to connect them to the larger Internet.\nLike our home, many others are also connected to the Internet. This not only happens with domestic LANs: corporate networks are a common example of local networks that are attached to the Internet in some way or another. The great thing with this idea is that, no matter how big a given network is, we can always regard it as a local network that’s attached to the larger Internet. We can even move a step further and subdivide a local network into more subnets. A sub-subnet would then be attached to a network of networks (the original, large subnet) which itself is attached to the Internet. You see how we can stack subnets on and on? This is what we mean by subnets being a logical division: they help us organize stuff.\nAside from easing easing network management, subnets also make the Internet more efficient. We a machine A sends a datagram to a machine B it has to be forwarded through an arbitrary number of routers (or, more specifically, layer 3 switches). These routers don’t know where every IP address can be reached: if they did, they would need to have lookup tables with 2^32 entries for IPv4 and with 2^128 entries for IPv6! Instead they contain a ‘rough’ estimate of where the datagrams need to be forwarded. This rough estimate comes in the shape of subnets: routers know where to forward a packet so that it gets closer to the destination subnet. They can rest assured that as the packet travels it will reach routers knowing more and more about the actual destination of the datagram. In this way, the datagram traverses a ‘funnel’ until it reaches its destination.\nIf we continue ‘abusing’ the funnel metaphor we can establish a relation between the funnel’s diameter and the specificity of the subnet. In other words, the smaller the subnet (that is, the less addresses it contains) the smaller the funnel’s diameter. This idea is at the heart of the longest matching prefix rule on routers. We are deviating a bit from the topic of subnets at this point and entering the realm of routing. However, these two concepts are intrinsically related. Routing deems the Internet as a collection of arbitrarily sized subnets. This allows routing to be done in a hierarchical, orderly and efficient manner.\nNow that we have a loose idea of what subnets are let’s take a look at how they’re specified. We really think it will make matters that much clearer!\nSpecifying subnets From an address point of view, a subnet is just a set of addresses. Nowadays these are almost always specified using the CIDR (Classless Inter-Domain Routing) syntax, but we’ll also take a look at the ’traditional’ way of defining them. We’ll even look at classful subnets!\nSubnets are specified by an network address and a subnet mask. The term mask is used due to how these two are related: the mask is applied to the address through a set of bitwise operators. These bitwise operators are the classic AND, OR, XOR and NOT. For those who learned programming in C, the operators are \u0026, |, ^ and ~. This way of handling numbers is very common in the realm of electronics. It’s very common to have to handle (and often burn) physical AND and NOT gates on digital electronics courses…\nWe’re presenting the outcome of logical operations in a couple table as a reminder:\nA B AND OR XOR NOT A 0 0 0 0 0 1 0 1 0 1 1 1 1 0 0 1 1 0 1 1 1 1 0 0 We’ll start by defining subnets in a somewhat ‘arid’ way. We promise examples will make this clearer.\nA subnet’s network address is defined as the result of applying the AND operation to the subnet’s address and subnet mask:\nnet_addr = subnet_addr \u0026 subnet_mask A subnet’s broadcast address is defined as the result of applying the OR operation to subnet’s address and the inverse of the subnet mask:\nbrd_addr = subnet_addr | (~subnet_mask) The subnet’s addresses are contained in the [net_addr, brd_addr] interval:\nnet_addr \u003c= a_subnet_addr \u003c= brd_addr Yeah, we know: what does that even mean? Let’s begin by looking into what the network and broadcast addresses are.\nThe subnet’s limits The lowest and highest addresses in a subnet do theoretically belong to a subnet. However, unless we are dealing with a point-to-point link not all of them are ‘usable’:\nThe network address is the lowest one in the subnet’s range. This address has no ‘real’ use in practice: it just identifies the network. This address is the one that will often be provided with the subnet mask to identify the actual subnet. Even though we’d bending the definition of subnets, we can unambiguously identify a subnet with a handful of addresses as long as we provided the correct subnet mask. However, the most common choice is the network address as it makes things much clearer.\nThe broadcast address is the larges address in the subnet’s range. When a host addresses a datagram to this address it’s broadcasted to the entire subnet. This address is not forwarded across routers. Back in the day it was (wrongly) forwarded. This opened up the possibility for Smurf Attacks, which made it possible to have the entire Internet pinging a poor machine…\nIn the specific case where we have just two machines on a single link these two addresses loose quite a lot of meaning: each machine would have one of the two addresses on that subnet. One of them would indeed be the network address and the other one would be the subnet address… The catch is some implementations will not allow machines to use these two addresses as regular IP addresses at all… In any case, this is more of a toy example, don’t take it too seriously :upside_down_face:.\nYou can find a nice discussion on network and broadcast addresses on the Network Engineering StackExchange\nThe subnet mask A subnet mask is just a string of as many bits as the IP address: it’s 32 bits long on IPv4 and 128 bits long on IPv6. When we were dealing with addresses we found out how we preferred to express them as decimal or hex numbers so that we could have an easier time handling them. The picture is a bit different when dealing with subnet masks. As we need to combine them with network addresses through bit-level operations we’ll find it’s better to think of them as regular binary numbers.\nNow, a subnet mask tells us which bits define the subnet and which identify a machine within that subnet. It logically divides the address in two distinct parts. Wherever we find a 1 on the subnet mask, we can be sure that bit is part of the subnet address: addresses with the exact same subnet address bits belong to the same subnet. Those bits showing a 0 on the subnet mask will be used to identify hosts belonging to that subnet. Thus, we can regard the subnet mask as a number telling us which bits define a logical address block. Those that can be ‘freely’ altered identify machines within that block.\nLet’s look at an example with a real-world scenario. We’ll always be working with the 192.168.1.0 subnet address and a subnet mask of 11111111 11111111 11111111 00000000. Notice we have purposefully spaced the binary number so that it’s easier to read. However, the spaces have no ‘real’ meaning. Let’s apply the operations:\nnet_addr = subnet_addr \u0026 subnet_mask 11000000 10101000 00000001 00000000 \u003c- subnet_addr (Recall the example of address-to-binary conversion we presented before!) 11111111 11111111 11111111 00000000 \u003c- subnet_mask ----------------------------------- \u003c- AND 11000000 10101000 00000001 00000000 -\u003e 192.168.1.0 brd_addr = subnet_addr | (~subnet_mask) 11000000 10101000 00000001 00000000 \u003c- subnet_addr 00000000 00000000 00000000 11111111 \u003c- ~subnet_mask ----------------------------------- \u003c- OR 11000000 10101000 00000001 11111111 -\u003e 192.168.1.255 Now we know that any address belonging to this subnet must be within the [192.168.1.0, 192.168.1.255] range. What’s more, usable addresses are in the range [192.168.1.1, 192.168.1.254] (or (192.168.1.0, 192.168.1.255) for those mathematicians out there :stuck_out_tongue_winking_eye:)\nIf we apply the concept of what a subnet mask is to the above we can see how an IPv4 address such as 192.168.1.3 within the previous subnet can be logically seen as:\nSubnet Host ------------------------- + -------- 11000000 10101000 00000001 00000011 In a more general way, we can regard addresses in this subnet as (QWERTYZX each stand for a single bit):\nSubnet Host ------------------------- + -------- 11000000 10101000 00000001 QWERTYZX This is a key idea that’s worth reviewing a couple of times! It’s also important to note that the ’larger’ the subnet mask is (i.e. the more lading 1s it has) the less hosts it will be able to provide service to. However, you’ll have more subnets at your disposal. It’s crucial to know that, no matter how you partition a network into subnets, you’ll always have the same number of available addresses (well, you’re loosing 2 on each subnet (network and broadcast), but you get the point). Interconnection between subnets is done by routers which can filter traffic, so if you want to have a tight control on traffic flows you can maybe deploy more-but-smaller subnets. If on the other hand you’re managing a subnet where every host should ‘see’ each other you can maybe opt for a large subnet. In the end it’s a matter of reaching a compromise based on the network’s needs!\nMaking subnet masks a bit more wieldy What if I told you that there’s an easier way to define a subnet than by specifying the subnet mask as a binary number? Cool right? Before walking through the two ways of specifying them let’s talk a bit about history before.\nThe age of classful networks We’ve already seen how the initial design of IPv4 didn’t really predict the size the Internet would reach. It estimated a way more modest usage, and so it made several assumptions as to what network sizes were going to likely be. That’s why they defined a set of subnet classes based on size:\nClass A subnets had an associated mask of 11111111 00000000 00000000 00000000. They were intended to be deployed wherever a large number of addresses was required. Class B subnets had an associated mask of 11111111 11111111 00000000 00000000. These were designed with mid-sized network needs in mind. Class C subnets had an associated mask of 11111111 11111111 11111111 00000000. These were devised for small networks. Up to now, all IPv4 addresses were unicast. Even though it doesn’t really concern us, when we send a datagram to a unicast address it’ll only reach a single machine. When we send it to a multicast address, it’ll be relayed to (gasp) multiple hosts. A common application of multicast addresses is the broadcast of multimedia streams for instance. Now, class D addresses are just that, multicast addresses. The initial design set some addresses apart for experimentation too. These are contained in the so called class E. As you might expect, these definitions only apply to the realm of IPv4. Don’t take the above too seriously, you can just read this Wikipedia entry if you want a bit more of information. The bottom line is the initial design of the Internet partitioned the entire IPv4 addressing space into a set of classes, which made subnetting a lot more rigid than it’s today.\nEnter CIDR CIDR (or, as we said before, Classless Inter-Domain Routing) is a way of defining subnets in a much more flexible way. In terms of notation it all boils down to specifying the subnet mask as /x, where x is a number on the [0, 32] interval. That x is just the number of leading 1s on the subnet mask:\n/1 -\u003e 10000000 00000000 00000000 00000000 /8 -\u003e 11111111 00000000 00000000 00000000 \u003c- These are the old Class A subnets! /12 -\u003e 11111111 11110000 00000000 00000000 /16 -\u003e 11111111 11111111 00000000 00000000 \u003c- These are the old Class B subnets! /24 -\u003e 11111111 11111111 11111111 00000000 \u003c- These are the old Class C subnets! /32 -\u003e 11111111 11111111 11111111 11111111 Now we are not restricted to just /8, /16 and /24: we can have a /12 subnet too! This is what motivates the C in CIDR.\nAn example of a CIDR subnet would be 192.168.1.0/24, which has usable addresses ranging from 192.168.1.1 to 192.168.1.254. Note you can also define the subnet as, say, 192.168.1.5/24. When you apply the AND operation to those two you’ll end up with the same network address (i.e. 192.168.1.0). However, people often use the network address for specifying the subnet: it makes understanding stuff easier and that’s actually the purpose of the network address…\nThe traditional notation Those who have worked with Cisco equipment are more used to another syntax. Instead of relying on the /x syntax, we can also specify the subnet mask as another dotted decimal address, just like a regular IPv4 address. The following presents some CIDR-to-traditional equivalencies:\n/8 -\u003e /255.0.0.0 /12 -\u003e /255.240.0.0 /16 -\u003e /255.255.0.0 /24 -\u003e /255.255.255.0 /32 -\u003e /255.255.255.255 Pay special attention to the /12 case: what’s easier to handle, /12 or /255.240.0.0? We at least feel strongly inclined toward the former option… We can define the example subnet in the previous section with this notation as 192.168.1.0/255.255.255.0.\nEvn though a bit more unwieldy, this traditional approach is needed if we are to deal with ‘weird’ subnets. Imagine the following:\nsubnet_mask = 11111111 11111111 11111111 00000001 === 255.255.255.1 === /? 11000000 10101000 00000001 00000000 \u003c- subnet_addr 11111111 11111111 11111111 00000001 \u003c- subnet_mask ----------------------------------- \u003c- AND 11000000 10101000 00000001 00000000 -\u003e 192.168.1.0 brd_addr = subnet_addr | (~subnet_mask) 11000000 10101000 00000001 00000000 \u003c- subnet_addr 00000000 00000000 00000000 11111110 \u003c- ~subnet_mask ----------------------------------- \u003c- OR 11000000 10101000 00000001 11111110 -\u003e 192.168.1.254 The subnet defined in the previous example is quite anomalous. According to the concept of what a subnet mask ’tells’ us we can see how the addresses belonging to this subnet need to have a 192.168.1 prefix and the also must have a trailing 0 (i.e. the least significant bit must be 0)! The following are examples of valid and invalid addresses:\n11000000 10101000 00000001 00000010 -\u003e 192.168.1.2 belongs to the 192.168.1.0/255.255.255.1 subnet! :) 11000000 10101000 00000001 00000011 -\u003e 192.168.1.3 doesn't belong to the 192.168.1.0/255.255.255.1 subnet! O_o Does an address belong to a subnet? How can we check we’re right? Just AND the subnet mask and the candidate IP address together. If the result is the network address for the subnet you’re checking it does belong to the subnet at hand. If it doesn’t… bad luck!\nsubnet_addr = 11000000 10101000 00000001 00000000 11000000 10101000 00000001 00000010 \u003c- 192.168.1.2 11111111 11111111 11111111 00000001 \u003c- 255.255.255.1 ----------------------------------- \u003c- AND 11000000 10101000 00000001 00000000 == subnet_addr :) 11000000 10101000 00000001 00000011 \u003c- 192.168.1.3 11111111 11111111 11111111 00000001 \u003c- 255.255.255.1 ----------------------------------- \u003c- AND 11000000 10101000 00000001 00000001 != subnet_addr O_o Even though this example is rather interesting, we have never encountered anything like this in the ‘wild’. Notice how the address space for this subnet is not consecutive. That is, the first usable address would be 192.168.1.2, the second one would be 192.168.1.4, the third one would be 192.168.1.6 and so on. This is bound to confuse users and administrators in the not even long run and, honestly, using this type of subnet masks is asking for trouble…\nIn a real-world scenario you’ll usually (if not always) encounter subnets that can be expressed as a CIDR block. This simplifies checking whether an address belongs to a subnet quite a lot: you just have to see whether the address belongs to the [net_address, broadcast_address] range!\nWhat about IPv6? Just like we said before, all these subnet ideas transition cleanly to the IPv6 realm. You’ll commonly have to deal with CIDR style subnet masks and you’ll just have to bear in mind that these can be as high as /128 instead of /32.\nWhat subnet contains a set of IP addresses? This question is quite tricky to answer in absolute terms. As with many things in life, the actual answer is it depends… They ‘witty’ and ‘wrong’ answer is that the 0.0.0.0/0 subnet contains the given addresses and that’s actually always true!\nWhen faced with such a question you should usually ask for more information. Begin by asking for either the network address or the broadcast address. If you know a single address belonging to the target subnet and you apply the definitions of the network and broadcast addresses you can work out thr actual subnet. As an aide you can try to find out the default gateway’s (i.e. router’s) address. It’s usually either the first or last usable address, although this is not a requirement. If you know it you can make a pretty educated guess as to what the network or broadcast addresses are.\nIn any case, this scenario is something that’s pretty different from case to case: best of luck!\nSumming up At this point we’ve covered pretty much everything pertaining subnets that anyone needs to know on an everyday basis. You can now:\nKnow the limit addresses of a subnet. Check whether an address belongs to a subnet. Define subnets containing a set of given addresses. All in all, these ideas are sometimes taken for granted but we have found out how they can get more complex than what wou could’ve initially expected.\nIf you have any comments, questions or suggestions, feel free to drop me an email!\nThanks for your time! Hope you found this useful :smile_cat:\n",
+  "wordCount" : "5086",
+  "inLanguage": "en",
+  "datePublished": "2021-12-16T00:00:00Z",
+  "dateModified": "2021-12-16T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Pablo Collado Soto"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://pcolladosoto.github.io/posts/ip-subnetting/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Just another Jedi...",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://pcolladosoto.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://pcolladosoto.github.io/" accesskey="h" title="Just another Jedi... (Alt + H)">Just another Jedi...</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://pcolladosoto.github.io/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://pcolladosoto.github.io/synth/" title="Synth">
+                    <span>Synth</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      An introduction to subnetting in IP networks
+    </h1>
+    <div class="post-meta"><span title='2021-12-16 00:00:00 +0000 UTC'>16126-12-16</span>&nbsp;·&nbsp;24 min&nbsp;·&nbsp;5086 words&nbsp;·&nbsp;Pablo Collado Soto
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#a-quick-look-at-the-osi-model">A quick look at the OSI Model</a></li>
+    <li><a href="#but-then-whats-an-ip-address">But then, what&rsquo;s an IP address?</a>
+      <ul>
+        <li><a href="#things-to-note">Things to note</a></li>
+      </ul>
+    </li>
+    <li><a href="#whats-the-difference-between-ipv4-and-ipv6">What&rsquo;s the difference between IPv4 and IPv6?</a>
+      <ul>
+        <li><a href="#representing-ipv6-addresses">Representing IPv6 addresses</a></li>
+        <li><a href="#thinks-to-know-and-fun-facts">Thinks to know and fun facts</a></li>
+      </ul>
+    </li>
+    <li><a href="#who-manages-this">Who manages this?</a></li>
+    <li><a href="#time-for-subnets">Time for subnets!</a>
+      <ul>
+        <li><a href="#specifying-subnets">Specifying subnets</a></li>
+        <li><a href="#the-subnets-limits">The subnet&rsquo;s limits</a></li>
+        <li><a href="#the-subnet-mask">The subnet mask</a></li>
+        <li><a href="#making-subnet-masks-a-bit-more-wieldy">Making subnet masks a bit more wieldy</a></li>
+        <li><a href="#does-an-address-belong-to-a-subnet">Does an address belong to a subnet?</a></li>
+        <li><a href="#what-about-ipv6">What about IPv6?</a></li>
+        <li><a href="#what-subnet-contains-a-set-of-ip-addresses">What subnet contains a set of IP addresses?</a></li>
+      </ul>
+    </li>
+    <li><a href="#summing-up">Summing up</a></li>
+  </ul>
+</nav>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="what-was-an-ip-again">What was an IP again?<a hidden class="anchor" aria-hidden="true" href="#what-was-an-ip-again">#</a></h1>
+<p>Let&rsquo;s start at the &lsquo;beginning&rsquo;. When computers communicate among themselves they need to refer to other parties involved in the communication in some way or another. In the context of today&rsquo;s Internet, machines identify themselves through <em>IP addresses</em>.</p>
+<p>Notice how the entire article is named &lsquo;<em>What was an IP again?</em>&rsquo;. That is purposefully <em>incorrect</em>. In order to understand why, we need to take a (small) step back and briefly visit the <a href="https://en.wikipedia.org/wiki/OSI_model"><em>OSI Model</em></a>.</p>
+<h2 id="a-quick-look-at-the-osi-model">A quick look at the OSI Model<a hidden class="anchor" aria-hidden="true" href="#a-quick-look-at-the-osi-model">#</a></h2>
+<p>When approaching any topic in networking, it&rsquo;s usually a good idea to have a conceptual grasp of whatever it is we are up against. At a lowish level, that usually implies thinking about where the topic at hand fits within the layers defined in the OSI model. For our purposes, we will only focus on the <a href="https://en.wikipedia.org/wiki/Network_layer"><em>network layer</em></a> (i.e. <em>layer 3</em>) of said model: a full blown description of OSI is well beyond the scope of this article.</p>
+<p>If, on the other hand, you feel more inclined towards the <em>TCP/IP</em> model of networks, this discussion would them belong within the <em>internet layer</em>. A good comparison of both models can be found <a href="https://www.cloudflare.com/en-gb/learning/network-layer/what-is-the-network-layer/">here</a>.</p>
+<p>In any case, we should that what we identify at layer 3 (i.e. L3) are <em>hosts</em>, or more precisely, <em>network interfaces</em>. For our discussion of subnetting we can safely assume a host has a single network interface, but that might not always be the case (I&rsquo;m looking at you, routers). That is, L3 identifiers refer to hosts.</p>
+<p>After all this nonsense, we can finally see why saying &lsquo;machine A has IP X.Y.Z.K&rsquo; is wrong: IP is the L3 protocol, what a machine &lsquo;has&rsquo; is an <em>IP address</em>. You can read up more (quite a lot more actually) on IP on its <a href="https://datatracker.ietf.org/doc/html/rfc791">RFC</a>.</p>
+<p>As a fun fact, we would like to mention that there are indeed some other L3 protocols besides IP. An example of that would be <a href="https://www.farsite.com/X.25/X.25_info/X.25.htm">X.25</a>. Things here get a bit messy, as X.25 predates the OSI model, which is why X.25 should be regarded more as a protocol suite that includes a L3 protocol on its <a href="https://en.wikipedia.org/wiki/X.25#Relation_to_the_OSI_Reference_Model"><em>packet layer</em></a>. Even though IP has pretty much conquered the world in terms of extension and usage, we shouldn&rsquo;t forget some other options exist. We even have circuit-switched instead of packet-switched networks too! That&rsquo;s a story for another time though&hellip;</p>
+<h2 id="but-then-whats-an-ip-address">But then, what&rsquo;s an IP address?<a hidden class="anchor" aria-hidden="true" href="#but-then-whats-an-ip-address">#</a></h2>
+<p>Now that we know the &lsquo;correct&rsquo; term when referring to addresses, we can discuss what they really are: just a <a href="https://datatracker.ietf.org/doc/html/rfc791#section-3.1">32-bit number</a>. Pretty anticlimactic right? However, this makes it very easy to conceptually work with IP: we can establish a number-to-machine correspondence when we think about how messages are addressed to a computer.</p>
+<p>We humans are clumsy machines. Thus, making us work with these 32-bit addresses in a binary format is a recipe for disaster. That&rsquo;s the reason why you will almost never see an IP address as something like this:</p>
+<pre><code>10101001011010010100001010101010
+</code></pre>
+<p>Imagine a machine you just configured can&rsquo;t be contacted: can you be sure you didn&rsquo;t mess up one of those <code>1</code>s and <code>0</code>s? In order to make these addresses more wieldy, we break them up into <em>bytes</em> and then present each of those bytes as a <em>base 10</em> number. Why base 10 numbers? They are the ones we use every day! This makes it a bit more &lsquo;familiar&rsquo; to work with addresses. The following shows how we can get a &lsquo;raw&rsquo; address in <em>binary</em> and then transform it into a familiar IP address:</p>
+<pre><code># This is our initial raw address
+11000000101010000000000100000001
+
+# Let's add a space between each byte to make it easier to work with
+11000000 10101000 00000001 00000001
+
+# Time to transform them to decimal. We'll do it a byte at a time.
+    # Note the `d` suffix on base 10 numbers and the `b` suffix on binary numbers.
+    # Note `a * b` is to be read as 'a times b'.
+    # Note `a^b` is to be read as 'a to the power of b'.
+
+    # ByteA
+    11000000b = 1 * 2^7 + 1 * 2^6 + 0 * 2^5 + 0 * 2^4 + 0 * 2^3 + 0 * 2^2 + 0 * 2^1 + 0 * 2^0 = 192d
+
+    # ByteB
+    10101000b = 1 * 2^7 + 0 * 2^6 + 1 * 2^5 + 0 * 2^4 + 1 * 2^3 + 0 * 2^2 + 0 * 2^1 + 0 * 2^0 = 168d
+
+    # ByteC
+    00000001b = 0 * 2^7 + 0 * 2^6 + 0 * 2^5 + 0 * 2^4 + 0 * 2^3 + 0 * 2^2 + 0 * 2^1 + 1 * 2^0 = 1d
+
+    # ByteD
+    00000001b = 0 * 2^7 + 0 * 2^6 + 0 * 2^5 + 0 * 2^4 + 0 * 2^3 + 0 * 2^2 + 0 * 2^1 + 1 * 2^0 = 1d
+
+# Then, our resulting IP address in the familiar format would be:
+11000000101010000000000100000001 -&gt; ByteA.ByteB.ByteC.ByteD -&gt; 192.168.1.1
+</code></pre>
+<p>Even though the above is nice for illustrative purposes, it&rsquo;s something we usually find tiring and error prone. Besides, it requires knowledge of representation systems such as binary&hellip; That&rsquo;s why people usually resort to calculators that do this out of the box. A good example would be <a href="https://codebeautify.org/binary-to-ip-converter">this one</a>. If you&rsquo;re into Python, you can also take a look at a (very simple) library we made: <a href="https://github.com/pcolladosoto/iptool">iptool</a>. These transformations are something you won&rsquo;t need on a daily basis. However, knowing what IP addresses are is crucial for understanding what subnets are and how they work.</p>
+<p>If you had no idea about what was going on in the snippet above, be sure to check <a href="https://www.mathsisfun.com/binary-number-system.html">this site</a> for a quick introduction on what binary numbers are and how they work.</p>
+<h3 id="things-to-note">Things to note<a hidden class="anchor" aria-hidden="true" href="#things-to-note">#</a></h3>
+<p>After learning how we can build a familiar representation of an IP address from the real thing, we can see how:</p>
+<ol>
+<li>
+<p>We can generate <code>2^32 = 4294967296</code> unique address ranging from <code>0</code> to <code>2^32 - 1 = 4294967295</code>. Given each Internet-capable device should have its own, unique address, the number is not that large. This is one of the aspects that motivated the appearance and proliferation of <a href="https://en.wikipedia.org/wiki/Network_address_translation">NATs</a>.</p>
+</li>
+<li>
+<p>Each of the octets in an address will be a number between <code>0</code> and <code>255</code>. This follows from the fact that a byte&rsquo;s value belongs to the <code>[0, 2^8 - 1] = [0, 255]</code> interval. Thus, we can be sure that <code>278.16.1.5</code> is <strong>not</strong> a valid address. This &lsquo;rule of thumb&rsquo; is crucial when it comes to spotting errors in network configurations.</p>
+</li>
+</ol>
+<h2 id="whats-the-difference-between-ipv4-and-ipv6">What&rsquo;s the difference between IPv4 and IPv6?<a hidden class="anchor" aria-hidden="true" href="#whats-the-difference-between-ipv4-and-ipv6">#</a></h2>
+<p>We actually have a better question: what happened to IPv5? The real answer is it never became an official protocol. It was mainly geared towards streaming and real-time applications such as VoIP. Given it used 32-bit addresses it suffered from the same problems than IPv4 and so it was never standardized. You can read (a bit) more on that <a href="https://www.lifewire.com/what-happened-to-ipv5-3971327">here</a>.</p>
+<p>Jokes aside, we haven&rsquo;t been <em>completely</em> honest with you :scream:. Like many things in the realm of computing, the IP protocol comes in several versions. Up to now we have been dealing with the &lsquo;standard&rsquo; version: IPv4. The thing is, IPv4 was designed at a time where few people could&rsquo;ve predicted the adoption the Internet was going to have. After all, networks were born within a military context as a project for the <em>Defense Advanced Research Projects Agency</em> (i.e. <em>DARPA</em>). Once it was made available to general users some design problems became more noticeable, the most obvious being the shortage of available addresses.</p>
+<p>Then, on 1995, the original <a href="https://datatracker.ietf.org/doc/html/rfc1883">IPv6 RFC</a> is published. Many people (myself included for quite some time) deem IPv6 as &lsquo;IPv4 with longer addresses&rsquo;. However, this approach just misses quite a lot of what IPv6 brings to the table: Link Local Addresses, Unique Local Addresses, restricted datagram fragmentation&hellip; You can read more on that <a href="https://en.wikipedia.org/wiki/Unique_local_address">here</a>, <a href="https://blog.zivaro.com/need-know-link-local-ipv6-addresses">here</a> and <a href="https://blogs.infoblox.com/ipv6-coe/common-ipv6-newbie-questions/">there</a>. You might also want to take a look at the current <a href="https://datatracker.ietf.org/doc/html/rfc8200">IPv6 RFC</a>. <a href="https://datatracker.ietf.org/doc/html/rfc4864">RFC 4864</a> also offers some very good insight into controversial topics such as why NAT doesn&rsquo;t really add security, something IPv4 supporters usually claim when deciding not migrate to IPv6.</p>
+<p>This is not a discussion on IPv6 or a comparison between that and IPv4: we are concerned with subnets and things of that nature. The good thing is the general idea translates seamlessly from IPv4 to IPv6, so the ensuing discussion is applicable to both realms. The most noticeable difference is that IPv6 addresses are 128 bits long instead of 32. That means, we have <code>2^128 = 3,402823669209385 * 10^38</code> unique IPv6 addresses: looks like we won&rsquo;t need NAT at all!</p>
+<h3 id="representing-ipv6-addresses">Representing IPv6 addresses<a hidden class="anchor" aria-hidden="true" href="#representing-ipv6-addresses">#</a></h3>
+<p>Just like with IPv4, at the end of the day an IPv6 address is a 128 bit integer. However, you&rsquo;ll see them expressed as hexadecimal numbers: they are much more wieldy than base 10 numbers! There are some other differences too:</p>
+<ol>
+<li>
+<p>The address is &lsquo;broken up&rsquo; into 16-bit chunks. Given a hex digit can represent the sames quantities as 4 bits, each 16-bit chunk is translated into 4 hex digits. If this sounds alien-y to you, be sure to take a look at <a href="https://www.tutorialspoint.com/hexadecimal-number-system">this</a> intro. You can also look for &lsquo;intro to hex numbers&rsquo; in a search engine of your choice. We really like DuckDuckGo though :ok_woman:</p>
+</li>
+<li>
+<p>The 16-bit chunks are separated by colons (i.e. <code>:</code>).</p>
+</li>
+<li>
+<p>If several consecutive 16-bit chunks are all zeros (i.e. <code>0</code>) you can summarize them with two consecutive colons (i.e. <code>::</code>). You can only use this <strong>once</strong>!</p>
+</li>
+<li>
+<p>You can drop leading zeros in a chunk (i.e. <code>0ABC</code> can be written as <code>ABC</code>).</p>
+</li>
+</ol>
+<p>With these rules we find how the following are valid IPv6 addresses:</p>
+<pre><code>2345:425:2ca1::567:5673:23b5 (this would be equivalent to 2345:0425:2ca1:0000:0000:0567:5673:23b5)
+2607:f0d0:1002:51::4         (this would be equivalent to 2607:f0d0:1002:0051:0000:0000:0000:0004)
+</code></pre>
+<h3 id="thinks-to-know-and-fun-facts">Thinks to know and fun facts<a hidden class="anchor" aria-hidden="true" href="#thinks-to-know-and-fun-facts">#</a></h3>
+<p>Given the natural relation between binary and hex numbers, note we <strong>cannot</strong> write an IPv6 address that&rsquo;s &rsquo;too big&rsquo; as long as we only use valid hex digits (i.e. <code>0123456789ABCD</code>) and just 4 of them. In other words, we cannot generate addresses that are wrong but that &rsquo;look okay&rsquo; like <code>800.433.312.257</code>. It has just as many digits as <code>192.168.160.180</code>, but the former is completely wrong!</p>
+<p>A good thing to know is that, if you want to explicitly use an address in applications such as browsers you <strong>need</strong> to enclose them with square brackets (i.e. <code>[]</code>). To understand why this is needed think about contacting a web server on a non-default port (i.e. <code>80</code> for HTTP and <code>443</code> for HTTPS). You would write something like the following in the search bar:</p>
+<pre><code>http://129.168.1.5:8080
+</code></pre>
+<p>Now, if instead of an IPv4 address you use an IPv6 one you would write:</p>
+<pre><code>http://2607:f0d0:1002:51::4:8080
+</code></pre>
+<p>How can the browser tell the port number (i.e. <code>8080</code>) apart from the address? They are both delimited through colons&hellip; Even though some rather complex logic could work things out, it&rsquo;s easier to just &lsquo;guard&rsquo; the address with a well known character. That way, the browser (or any application) can quickly extract the address and begin sending stuff. Thus, the following is what you <em>should</em> write to contact that same process:</p>
+<pre><code>http://[2607:f0d0:1002:51::4]:8080
+</code></pre>
+<h2 id="who-manages-this">Who manages this?<a hidden class="anchor" aria-hidden="true" href="#who-manages-this">#</a></h2>
+<p>Now we have been introduced to IPv4 and IPv6 addresses. Time for a pat in the back! :clap:</p>
+<p>Managing all these addresses comes with quite a lot of organizational overhead. Even though it&rsquo;s not the topic of this article, we would like to mention that addresses are manged by several organizations (Regional Internet Registrars) that are geographically distributed:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Geographical Area</th>
+<th style="text-align:center">RIR</th>
+<th style="text-align:center">Website</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Europe</td>
+<td style="text-align:center">RIPE</td>
+<td style="text-align:center"><a href="https://www.ripe.net/">https://www.ripe.net/</a></td>
+</tr>
+<tr>
+<td style="text-align:center">Asia &amp; Pacific</td>
+<td style="text-align:center">APNIC</td>
+<td style="text-align:center"><a href="https://www.apnic.net">https://www.apnic.net</a></td>
+</tr>
+<tr>
+<td style="text-align:center">Africa</td>
+<td style="text-align:center">AFRINIC</td>
+<td style="text-align:center"><a href="https://www.afrinic.net">https://www.afrinic.net</a></td>
+</tr>
+<tr>
+<td style="text-align:center">Latin America</td>
+<td style="text-align:center">LACNIC</td>
+<td style="text-align:center"><a href="https://www.lacnic.net">https://www.lacnic.net</a></td>
+</tr>
+<tr>
+<td style="text-align:center">North America</td>
+<td style="text-align:center">ARIN</td>
+<td style="text-align:center"><a href="https://www.arin.net">https://www.arin.net</a></td>
+</tr>
+</tbody>
+</table>
+<p>This doesn&rsquo;t really concern us, but the sites are a great information source and I find this type of thing quite interesting :woman_shrugging:</p>
+<h2 id="time-for-subnets">Time for subnets!<a hidden class="anchor" aria-hidden="true" href="#time-for-subnets">#</a></h2>
+<p>Now it&rsquo;s time to picture ourselves as network administrators&hellip; How would we go about managing a corporate network or even a home network? Should we manage addresses as a bunch of loose identifiers with no relation whatsoever? As you might have guessed, that&rsquo;s not how stuff works!</p>
+<p>Simply put, subnets are <em>logical</em> divisions of the IP address space. Now, that sounds like some new-age mumbo jumbo right? It&rsquo;s often said that the Internet is a <em>network of networks</em>. It&rsquo;s something most of us repeat like a mantra but&hellip; what does it mean?</p>
+<p>Many of us have never worked with networks detached from the Internet. The common use case of a home LAN (Local Area Network) is often (if not always) equipped with an Internet-capable connection. The thing is, this network could be completely isolated from the Internet and still be very useful. We could access local services like, for instance, a Minecraft server running on a machine plugged into our home router. We can now begin to see how LANs are networks in their own right. It just so happens that we decide to connect them to the larger Internet.</p>
+<p>Like our home, many others are also connected to the Internet. This not only happens with domestic LANs: corporate networks are a common example of local networks that are attached to the Internet in some way or another. The great thing with this idea is that, no matter how big a given network is, we can always regard it as a local network that&rsquo;s attached to the larger Internet. We can even move a step further and subdivide a local network into more subnets. A sub-subnet would then be attached to a network of networks (the original, large subnet) which itself is attached to the Internet. You see how we can stack subnets on and on? This is what we mean by subnets being a logical division: they help us organize stuff.</p>
+<p>Aside from easing easing network management, subnets also make the Internet more efficient. We a machine <em>A</em> sends a datagram to a machine <em>B</em> it has to be forwarded through an arbitrary number of routers (or, more specifically, layer 3 switches). These routers don&rsquo;t know where <strong>every</strong> IP address can be reached: if they did, they would need to have lookup tables with <code>2^32</code> entries for IPv4 and with <code>2^128</code> entries for IPv6! Instead they contain a &lsquo;rough&rsquo; estimate of where the datagrams need to be forwarded. This rough estimate comes in the shape of subnets: routers know where to forward a packet so that it gets closer to the destination subnet. They can rest assured that as the packet travels it will reach routers knowing more and more about the actual destination of the datagram. In this way, the datagram traverses a &lsquo;funnel&rsquo; until it reaches its destination.</p>
+<p>If we continue &lsquo;abusing&rsquo; the funnel metaphor we can establish a relation between the funnel&rsquo;s diameter and the specificity of the subnet. In other words, the smaller the subnet (that is, the less addresses it contains) the smaller the funnel&rsquo;s diameter. This idea is at the heart of the <a href="https://en.wikipedia.org/wiki/Longest_prefix_match">longest matching prefix</a> rule on routers. We are deviating a bit from the topic of subnets at this point and entering the realm of routing. However, these two concepts are intrinsically related. Routing deems the Internet as a collection of arbitrarily sized subnets. This allows routing to be done in a hierarchical, orderly and efficient manner.</p>
+<p>Now that we have a loose idea of what subnets are let&rsquo;s take a look at how they&rsquo;re specified. We really think it will make matters that much clearer!</p>
+<h3 id="specifying-subnets">Specifying subnets<a hidden class="anchor" aria-hidden="true" href="#specifying-subnets">#</a></h3>
+<p>From an address point of view, a subnet is just a set of addresses. Nowadays these are almost always specified using the <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> (Classless Inter-Domain Routing) syntax, but we&rsquo;ll also take a look at the &rsquo;traditional&rsquo; way of defining them. We&rsquo;ll even look at classful subnets!</p>
+<p>Subnets are specified by an <em>network address</em> and a <em>subnet mask</em>. The term mask is used due to how these two are related: the mask is applied to the address through a set of bitwise operators. These bitwise operators are the classic <code>AND</code>, <code>OR</code>, <code>XOR</code> and <code>NOT</code>. For those who learned programming in C, the operators are <code>&amp;</code>, <code>|</code>, <code>^</code> and <code>~</code>. This way of handling numbers is very common in the realm of electronics. It&rsquo;s very common to have to handle (and often burn) physical <code>AND</code> and <code>NOT</code> gates on digital electronics courses&hellip;</p>
+<p>We&rsquo;re presenting the outcome of logical operations in a couple table as a reminder:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">A</th>
+<th style="text-align:center">B</th>
+<th style="text-align:center">AND</th>
+<th style="text-align:center">OR</th>
+<th style="text-align:center">XOR</th>
+<th style="text-align:center">NOT A</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+</tbody>
+</table>
+<p>We&rsquo;ll start by defining subnets in a somewhat &lsquo;arid&rsquo; way. We promise examples will make this clearer.</p>
+<ol>
+<li>
+<p>A subnet&rsquo;s network address is defined as the result of applying the <code>AND</code> operation to the subnet&rsquo;s address and subnet mask:</p>
+<pre><code> net_addr = subnet_addr &amp; subnet_mask
+</code></pre>
+</li>
+<li>
+<p>A subnet&rsquo;s broadcast address is defined as the result of applying the <code>OR</code> operation to subnet&rsquo;s address and the inverse of the subnet mask:</p>
+<pre><code> brd_addr = subnet_addr | (~subnet_mask)
+</code></pre>
+</li>
+<li>
+<p>The subnet&rsquo;s addresses are contained in the <code>[net_addr, brd_addr]</code> interval:</p>
+<pre><code> net_addr &lt;= a_subnet_addr &lt;= brd_addr
+</code></pre>
+</li>
+</ol>
+<p>Yeah, we know: what does that even mean? Let&rsquo;s begin by looking into what the network and broadcast addresses are.</p>
+<h3 id="the-subnets-limits">The subnet&rsquo;s limits<a hidden class="anchor" aria-hidden="true" href="#the-subnets-limits">#</a></h3>
+<p>The lowest and highest addresses in a subnet do theoretically belong to a subnet. However, unless we are dealing with a point-to-point link not all of them are &lsquo;usable&rsquo;:</p>
+<ol>
+<li>
+<p>The <em>network address</em> is the lowest one in the subnet&rsquo;s range. This address has no &lsquo;real&rsquo; use in practice: it just identifies the network. This address is the one that will often be provided with the subnet mask to identify the actual subnet. Even though we&rsquo;d bending the definition of subnets, we can unambiguously identify a subnet with a handful of addresses as long as we provided the correct subnet mask. However, the most common choice is the network address as it makes things much clearer.</p>
+</li>
+<li>
+<p>The <em>broadcast address</em> is the larges address in the subnet&rsquo;s range. When a host addresses a datagram to this address it&rsquo;s broadcasted to the entire subnet. This address <strong>is not</strong> forwarded across routers. Back in the day it was (wrongly) forwarded. This opened up the possibility for <a href="https://en.wikipedia.org/wiki/Smurf_attack">Smurf Attacks</a>, which made it possible to have the entire Internet pinging a poor machine&hellip;</p>
+</li>
+</ol>
+<p>In the specific case where we have just two machines on a single link these two addresses loose quite a lot of meaning: each machine would have one of the two addresses on that subnet. One of them would indeed be the network address and the other one would be the subnet address&hellip; The catch is some implementations will not allow machines to use these two addresses as regular IP addresses at all&hellip; In any case, this is more of a toy example, don&rsquo;t take it too seriously :upside_down_face:.</p>
+<p>You can find a nice discussion on network and broadcast addresses on the <a href="https://networkengineering.stackexchange.com/questions/11200/what-is-the-purpose-of-network-address">Network Engineering StackExchange</a></p>
+<h3 id="the-subnet-mask">The subnet mask<a hidden class="anchor" aria-hidden="true" href="#the-subnet-mask">#</a></h3>
+<p>A subnet mask is just a string of as many bits as the IP address: it&rsquo;s 32 bits long on IPv4 and 128 bits long on IPv6. When we were dealing with addresses we found out how we preferred to express them as decimal or hex numbers so that we could have an easier time handling them. The picture is a bit different when dealing with subnet masks. As we need to combine them with network addresses through bit-level operations we&rsquo;ll find it&rsquo;s better to think of them as regular binary numbers.</p>
+<p>Now, a subnet mask tells us which bits define the subnet and which identify a machine <strong>within</strong> that subnet. It logically divides the address in two distinct parts. Wherever we find a <code>1</code> on the subnet mask, we can be sure that bit is part of the subnet address: addresses with the exact same subnet address bits belong to the same subnet. Those bits showing a <code>0</code> on the subnet mask will be used to identify hosts belonging to that subnet. Thus, we can regard the subnet mask as a number telling us which bits define a logical address block. Those that can be &lsquo;freely&rsquo; altered identify machines within that block.</p>
+<p>Let&rsquo;s look at an example with a real-world scenario. We&rsquo;ll always be working with the <code>192.168.1.0</code> subnet address and a subnet mask of <code>11111111 11111111 11111111 00000000</code>. Notice we have purposefully spaced the binary number so that it&rsquo;s easier to read. However, the spaces have no &lsquo;real&rsquo; meaning. Let&rsquo;s apply the operations:</p>
+<pre><code>net_addr = subnet_addr &amp; subnet_mask
+
+11000000 10101000 00000001 00000000 &lt;- subnet_addr (Recall the example of address-to-binary conversion we presented before!)
+11111111 11111111 11111111 00000000 &lt;- subnet_mask
+----------------------------------- &lt;-     AND
+11000000 10101000 00000001 00000000 -&gt; 192.168.1.0
+
+brd_addr = subnet_addr | (~subnet_mask)
+
+11000000 10101000 00000001 00000000 &lt;-  subnet_addr
+00000000 00000000 00000000 11111111 &lt;- ~subnet_mask
+----------------------------------- &lt;-      OR
+11000000 10101000 00000001 11111111 -&gt;  192.168.1.255
+</code></pre>
+<p>Now we know that any address belonging to this subnet must be within the <code>[192.168.1.0, 192.168.1.255]</code> range. What&rsquo;s more, usable addresses are in the range <code>[192.168.1.1, 192.168.1.254]</code> (or <code>(192.168.1.0, 192.168.1.255)</code> for those mathematicians out there :stuck_out_tongue_winking_eye:)</p>
+<p>If we apply the concept of what a subnet mask is to the above we can see how an IPv4 address such as <code>192.168.1.3</code> within the previous subnet can be logically seen as:</p>
+<pre><code>          Subnet              Host
+------------------------- + --------
+11000000 10101000 00000001  00000011
+</code></pre>
+<p>In a more general way, we can regard addresses in this subnet as (<code>QWERTYZX</code> each stand for a single bit):</p>
+<pre><code>          Subnet              Host
+------------------------- + --------
+11000000 10101000 00000001  QWERTYZX
+</code></pre>
+<p>This is a key idea that&rsquo;s worth reviewing a couple of times! It&rsquo;s also important to note that the &rsquo;larger&rsquo; the subnet mask is (i.e. the more lading <code>1</code>s it has) the less hosts it will be able to provide service to. However, you&rsquo;ll have more subnets at your disposal. It&rsquo;s crucial to know that, no matter how you partition a network into subnets, you&rsquo;ll always have the same number of available addresses (well, you&rsquo;re loosing 2 on each subnet (network and broadcast), but you get the point). Interconnection between subnets is done by routers which can filter traffic, so if you want to have a tight control on traffic flows you can maybe deploy more-but-smaller subnets. If on the other hand you&rsquo;re managing a subnet where every host should &lsquo;see&rsquo; each other you can maybe opt for a large subnet. In the end it&rsquo;s a matter of reaching a compromise based on the network&rsquo;s needs!</p>
+<h3 id="making-subnet-masks-a-bit-more-wieldy">Making subnet masks a bit more wieldy<a hidden class="anchor" aria-hidden="true" href="#making-subnet-masks-a-bit-more-wieldy">#</a></h3>
+<p>What if I told you that there&rsquo;s an easier way to define a subnet than by specifying the subnet mask as a binary number? Cool right? Before walking through the two ways of specifying them let&rsquo;s talk a bit about history before.</p>
+<h4 id="the-age-of-classful-networks">The age of classful networks<a hidden class="anchor" aria-hidden="true" href="#the-age-of-classful-networks">#</a></h4>
+<p>We&rsquo;ve already seen how the initial design of IPv4 didn&rsquo;t really predict the size the Internet would reach. It estimated a way more modest usage, and so it made several assumptions as to what network sizes were going to likely be. That&rsquo;s why they defined a set of <em>subnet classes</em> based on size:</p>
+<ol>
+<li>Class <em>A</em> subnets had an associated mask of <code>11111111 00000000 00000000 00000000</code>. They were intended to be deployed wherever a large number of addresses was required.</li>
+<li>Class <em>B</em> subnets had an associated mask of <code>11111111 11111111 00000000 00000000</code>. These were designed with mid-sized network needs in mind.</li>
+<li>Class <em>C</em> subnets had an associated mask of <code>11111111 11111111 11111111 00000000</code>. These were devised for small networks.</li>
+<li>Up to now, all IPv4 addresses were <em>unicast</em>. Even though it doesn&rsquo;t really concern us, when we send a datagram to a <em>unicast</em> address it&rsquo;ll only reach a single machine. When we send it to a <em>multicast</em> address, it&rsquo;ll be relayed to (gasp) multiple hosts. A common application of multicast addresses is the broadcast of multimedia streams for instance. Now, class <em>D</em> addresses are just that, multicast addresses.</li>
+<li>The initial design set some addresses apart for experimentation too. These are contained in the so called class <em>E</em>.</li>
+</ol>
+<p>As you might expect, these definitions only apply to the realm of IPv4. Don&rsquo;t take the above too seriously, you can just read <a href="https://en.wikipedia.org/wiki/Classful_network">this Wikipedia entry</a> if you want a bit more of information. The bottom line is the initial design of the Internet partitioned the entire IPv4 addressing space into a set of classes, which made subnetting a lot more rigid than it&rsquo;s today.</p>
+<h4 id="enter-cidr">Enter CIDR<a hidden class="anchor" aria-hidden="true" href="#enter-cidr">#</a></h4>
+<p>CIDR (or, as we said before, Classless Inter-Domain Routing) is a way of defining subnets in a much more flexible way. In terms of notation it all boils down to specifying the subnet mask as <code>/x</code>, where <code>x</code> is a number on the <code>[0, 32]</code> interval. That <code>x</code> is just the number of leading <code>1</code>s on the subnet mask:</p>
+<pre><code>/1  -&gt; 10000000 00000000 00000000 00000000
+/8  -&gt; 11111111 00000000 00000000 00000000 &lt;- These are the old Class A subnets!
+/12 -&gt; 11111111 11110000 00000000 00000000
+/16 -&gt; 11111111 11111111 00000000 00000000 &lt;- These are the old Class B subnets!
+/24 -&gt; 11111111 11111111 11111111 00000000 &lt;- These are the old Class C subnets!
+/32 -&gt; 11111111 11111111 11111111 11111111
+</code></pre>
+<p>Now we are not restricted to just <code>/8</code>, <code>/16</code> and <code>/24</code>: we can have a <code>/12</code> subnet too! This is what motivates the C in CIDR.</p>
+<p>An example of a CIDR subnet would be <code>192.168.1.0/24</code>, which has usable addresses ranging from <code>192.168.1.1</code> to <code>192.168.1.254</code>. Note you can also define the subnet as, say, <code>192.168.1.5/24</code>. When you apply the <code>AND</code> operation to those two you&rsquo;ll end up with the same network address (i.e. <code>192.168.1.0</code>). However, people often use the network address for specifying the subnet: it makes understanding stuff easier and that&rsquo;s actually the purpose of the network address&hellip;</p>
+<h4 id="the-traditional-notation">The traditional notation<a hidden class="anchor" aria-hidden="true" href="#the-traditional-notation">#</a></h4>
+<p>Those who have worked with Cisco equipment are more used to another syntax. Instead of relying on the <code>/x</code> syntax, we can also specify the subnet mask as another dotted decimal address, just like a regular IPv4 address. The following presents some CIDR-to-traditional equivalencies:</p>
+<pre><code>/8  -&gt; /255.0.0.0
+/12 -&gt; /255.240.0.0
+/16 -&gt; /255.255.0.0
+/24 -&gt; /255.255.255.0
+/32 -&gt; /255.255.255.255
+</code></pre>
+<p>Pay special attention to the <code>/12</code> case: what&rsquo;s easier to handle, <code>/12</code> or <code>/255.240.0.0</code>? We at least feel strongly inclined toward the former option&hellip; We can define the example subnet in the previous section with this notation as <code>192.168.1.0/255.255.255.0</code>.</p>
+<p>Evn though a bit more unwieldy, this traditional approach is needed if we are to deal with &lsquo;weird&rsquo; subnets. Imagine the following:</p>
+<pre><code>subnet_mask = 11111111 11111111 11111111 00000001 === 255.255.255.1 === /?
+
+11000000 10101000 00000001 00000000 &lt;- subnet_addr
+11111111 11111111 11111111 00000001 &lt;- subnet_mask
+----------------------------------- &lt;-     AND
+11000000 10101000 00000001 00000000 -&gt; 192.168.1.0
+
+brd_addr = subnet_addr | (~subnet_mask)
+
+11000000 10101000 00000001 00000000 &lt;-  subnet_addr
+00000000 00000000 00000000 11111110 &lt;- ~subnet_mask
+----------------------------------- &lt;-      OR
+11000000 10101000 00000001 11111110 -&gt;  192.168.1.254
+</code></pre>
+<p>The subnet defined in the previous example is quite anomalous. According to the concept of what a subnet mask &rsquo;tells&rsquo; us we can see how the addresses belonging to this subnet need to have a <code>192.168.1</code> prefix and the also <strong>must</strong> have a trailing <code>0</code> (i.e. the least significant bit must be <code>0</code>)! The following are examples of valid and invalid addresses:</p>
+<pre><code>11000000 10101000 00000001 00000010 -&gt; 192.168.1.2 belongs to the 192.168.1.0/255.255.255.1 subnet! :)
+11000000 10101000 00000001 00000011 -&gt; 192.168.1.3 doesn't belong to the 192.168.1.0/255.255.255.1 subnet! O_o
+</code></pre>
+<h3 id="does-an-address-belong-to-a-subnet">Does an address belong to a subnet?<a hidden class="anchor" aria-hidden="true" href="#does-an-address-belong-to-a-subnet">#</a></h3>
+<p>How can we check we&rsquo;re right? Just <code>AND</code> the subnet mask and the candidate IP address together. If the result is the network address for the subnet you&rsquo;re checking it does belong to the subnet at hand. If it doesn&rsquo;t&hellip; bad luck!</p>
+<pre><code>subnet_addr = 11000000 10101000 00000001 00000000
+
+11000000 10101000 00000001 00000010 &lt;- 192.168.1.2
+11111111 11111111 11111111 00000001 &lt;- 255.255.255.1
+----------------------------------- &lt;-     AND
+11000000 10101000 00000001 00000000 == subnet_addr :)
+
+11000000 10101000 00000001 00000011 &lt;- 192.168.1.3
+11111111 11111111 11111111 00000001 &lt;- 255.255.255.1
+----------------------------------- &lt;-     AND
+11000000 10101000 00000001 00000001 != subnet_addr O_o
+</code></pre>
+<p>Even though this example is rather interesting, we have never encountered anything like this in the &lsquo;wild&rsquo;. Notice how the address space for this subnet <strong>is not</strong> consecutive. That is, the first usable address would be <code>192.168.1.2</code>, the second one would be <code>192.168.1.4</code>, the third one would be <code>192.168.1.6</code> and so on. This is bound to confuse users and administrators in the not even long run and, honestly, using this type of subnet masks is asking for trouble&hellip;</p>
+<p>In a real-world scenario you&rsquo;ll usually (if not always) encounter subnets that can be expressed as a CIDR block. This simplifies checking whether an address belongs to a subnet quite a lot: you just have to see whether the address belongs to the <code>[net_address, broadcast_address]</code> range!</p>
+<h3 id="what-about-ipv6">What about IPv6?<a hidden class="anchor" aria-hidden="true" href="#what-about-ipv6">#</a></h3>
+<p>Just like we said before, all these subnet ideas transition cleanly to the IPv6 realm. You&rsquo;ll commonly have to deal with CIDR style subnet masks and you&rsquo;ll just have to bear in mind that these can be as high as <code>/128</code> instead of <code>/32</code>.</p>
+<h3 id="what-subnet-contains-a-set-of-ip-addresses">What subnet contains a set of IP addresses?<a hidden class="anchor" aria-hidden="true" href="#what-subnet-contains-a-set-of-ip-addresses">#</a></h3>
+<p>This question is quite tricky to answer in absolute terms. As with many things in life, the actual answer is it depends&hellip; They &lsquo;witty&rsquo; and &lsquo;wrong&rsquo; answer is that the <code>0.0.0.0/0</code> subnet contains the given addresses and that&rsquo;s actually always true!</p>
+<p>When faced with such a question you should usually ask for more information. Begin by asking for either the network address or the broadcast address. If you know a single address belonging to the target subnet and you apply the definitions of the network and broadcast addresses you can work out thr actual subnet. As an aide you can try to find out the default gateway&rsquo;s (i.e. router&rsquo;s) address. It&rsquo;s usually either the first or last usable address, although this <strong>is not</strong> a requirement. If you know it you can make a pretty educated guess as to what the network or broadcast addresses are.</p>
+<p>In any case, this scenario is something that&rsquo;s pretty different from case to case: best of luck!</p>
+<h2 id="summing-up">Summing up<a hidden class="anchor" aria-hidden="true" href="#summing-up">#</a></h2>
+<p>At this point we&rsquo;ve covered pretty much everything pertaining subnets that anyone needs to know on an everyday basis. You can now:</p>
+<ol>
+<li>Know the limit addresses of a subnet.</li>
+<li>Check whether an address belongs to a subnet.</li>
+<li>Define subnets containing a set of given addresses.</li>
+</ol>
+<p>All in all, these ideas are sometimes taken for granted but we have found out how they can get more complex than what wou could&rsquo;ve initially expected.</p>
+<hr>
+<p>If you have any comments, questions or suggestions, feel free to drop me an email!</p>
+<p>Thanks for your time! Hope you found this useful :smile_cat:</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://pcolladosoto.github.io/tags/networking-fundamentals/">networking-fundamentals</a></li>
+      <li><a href="https://pcolladosoto.github.io/tags/ipv4/">IPv4</a></li>
+      <li><a href="https://pcolladosoto.github.io/tags/ipv6/">IPv6</a></li>
+    </ul>
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share An introduction to subnetting in IP networks on twitter"
+        href="https://twitter.com/intent/tweet/?text=An%20introduction%20to%20subnetting%20in%20IP%20networks&amp;url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fip-subnetting%2f&amp;hashtags=networking-fundamentals%2cIPv4%2cIPv6">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share An introduction to subnetting in IP networks on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fip-subnetting%2f&amp;title=An%20introduction%20to%20subnetting%20in%20IP%20networks&amp;summary=An%20introduction%20to%20subnetting%20in%20IP%20networks&amp;source=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fip-subnetting%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share An introduction to subnetting in IP networks on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fip-subnetting%2f&title=An%20introduction%20to%20subnetting%20in%20IP%20networks">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share An introduction to subnetting in IP networks on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fip-subnetting%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share An introduction to subnetting in IP networks on whatsapp"
+        href="https://api.whatsapp.com/send?text=An%20introduction%20to%20subnetting%20in%20IP%20networks%20-%20https%3a%2f%2fpcolladosoto.github.io%2fposts%2fip-subnetting%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share An introduction to subnetting in IP networks on telegram"
+        href="https://telegram.me/share/url?text=An%20introduction%20to%20subnetting%20in%20IP%20networks&amp;url=https%3a%2f%2fpcolladosoto.github.io%2fposts%2fip-subnetting%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://pcolladosoto.github.io/">Just another Jedi...</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

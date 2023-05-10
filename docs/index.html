@@ -139,16 +139,77 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Cross Compiling stuff with Docker
+    <h2>Checking a system&#39;s endianness
     </h2>
   </header>
   <div class="entry-content">
-    <p>Do we really have to compile stuff in the 21st century? Short answer: yes. Long answer: it really depends on the context you develop programs in, but chances are you’ll end up running into compilation at some point…
-Old school programming languages like C and C&#43;&#43; are compiled languages, that is, their source files (*.c and *.cpp, respectively) must be compiled (and probably linked and whatnot) into an executable that can later be executed....</p>
+    <p>So… what’s endianness? Put simply, the endianness of a machine tells us how that machine’s memory is organised. In order to fully grasp what that means we need to take a small step back and take a look at how we interact with a computer’s memory.
+Before we begin note we’ll make extensive use of hexadecimal (i.e. hex) numbers. When we’re using them we’ll prefix them with 0x.
+What was memory again?...</p>
   </div>
-  <footer class="entry-footer"><span title='2023-05-08 00:00:00 +0000 UTC'>08/05/8056</span>&nbsp;·&nbsp;16 min&nbsp;·&nbsp;3407 words&nbsp;·&nbsp;Pablo Collado Soto</footer>
-  <a class="entry-link" aria-label="post link to Cross Compiling stuff with Docker" href="https://pcolladosoto.github.io/posts/cross-cc/"></a>
+  <footer class="entry-footer"><span title='2022-04-26 00:00:00 +0000 UTC'>26046-04-26</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;1873 words&nbsp;·&nbsp;Pablo Collado Soto</footer>
+  <a class="entry-link" aria-label="post link to Checking a system&#39;s endianness" href="https://pcolladosoto.github.io/posts/endianness/"></a>
 </article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>Persistently modifying an operating system image
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Why would we want to do this? I personally love Raspberry Pis: they are super versatile and I’m always thinking of new ways to use them.
+Instead of hooking up a keyboard and mouse to them I’m used to deploying them headlessly: I just plug them in and have them connect my home network so that I can interact with them over SSH. This however poses some difficulties:
+How can I configure a static IP address beforehand?...</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-04-26 00:00:00 +0000 UTC'>26046-04-26</span>&nbsp;·&nbsp;9 min&nbsp;·&nbsp;1891 words&nbsp;·&nbsp;Pablo Collado Soto</footer>
+  <a class="entry-link" aria-label="post link to Persistently modifying an operating system image" href="https://pcolladosoto.github.io/posts/img-mod/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>Controlling access through a WireGuard VPN
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Why would we want to control access to a machine? In an ideal world, we wouldn’t need to protect our own machines: nobody would try to break into them in the first place.
+The truth, however, is that we should always control who can access our servers and computers when we expose them publicly. Let’s take a look at a common scenario.
+Securing SSH When setting up servers we usually leave port 22 open: that’s where the SSH daemon (i....</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-03-13 00:00:00 +0000 UTC'>13036-03-13</span>&nbsp;·&nbsp;15 min&nbsp;·&nbsp;3008 words&nbsp;·&nbsp;Pablo Collado Soto</footer>
+  <a class="entry-link" aria-label="post link to Controlling access through a WireGuard VPN" href="https://pcolladosoto.github.io/posts/wg-acl/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>Setting up a WireGuard VPN
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>So… what are VPNs really? Well, that’s not really a straightforward question. Put simply, Virtual Private Networks (that’s where VPN comes from :gasp:) allow us to leverage public networks such as the Internet in such a way that those communicating through the VPN really think they’re on a real private network: they have no idea their traffic is actually traversing public networks at all!
+Now, this can be accomplished in several ways: we have IPsec and MPLS-based VPNs for instance....</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-03-12 00:00:00 +0000 UTC'>12036-03-12</span>&nbsp;·&nbsp;15 min&nbsp;·&nbsp;3097 words&nbsp;·&nbsp;Pablo Collado Soto</footer>
+  <a class="entry-link" aria-label="post link to Setting up a WireGuard VPN" href="https://pcolladosoto.github.io/posts/wg-setup/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>An introduction to subnetting in IP networks
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What was an IP again? Let’s start at the ‘beginning’. When computers communicate among themselves they need to refer to other parties involved in the communication in some way or another. In the context of today’s Internet, machines identify themselves through IP addresses.
+Notice how the entire article is named ‘What was an IP again?’. That is purposefully incorrect. In order to understand why, we need to take a (small) step back and briefly visit the OSI Model....</p>
+  </div>
+  <footer class="entry-footer"><span title='2021-12-16 00:00:00 +0000 UTC'>16126-12-16</span>&nbsp;·&nbsp;24 min&nbsp;·&nbsp;5086 words&nbsp;·&nbsp;Pablo Collado Soto</footer>
+  <a class="entry-link" aria-label="post link to An introduction to subnetting in IP networks" href="https://pcolladosoto.github.io/posts/ip-subnetting/"></a>
+</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="https://pcolladosoto.github.io/page/2/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
     </main>
     
 <footer class="footer">
