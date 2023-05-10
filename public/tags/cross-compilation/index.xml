@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>cross-compilation on Just another Jedi...</title>
+    <link>https://pcolladosoto.github.io/tags/cross-compilation/</link>
+    <description>Recent content in cross-compilation on Just another Jedi...</description>
+    <image>
+      <title>Just another Jedi...</title>
+      <url>https://pcolladosoto.github.io/me.png</url>
+      <link>https://pcolladosoto.github.io/me.png</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 08 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://pcolladosoto.github.io/tags/cross-compilation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Cross Compiling stuff with Docker</title>
+      <link>https://pcolladosoto.github.io/posts/cross-cc/</link>
+      <pubDate>Mon, 08 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://pcolladosoto.github.io/posts/cross-cc/</guid>
+      <description>Do we really have to compile stuff in the 21st century? Short answer: yes. Long answer: it really depends on the context you develop programs in, but chances are you&amp;rsquo;ll end up running into compilation at some point&amp;hellip;
+Old school programming languages like C and C++ are compiled languages, that is, their source files (*.c and *.cpp, respectively) must be compiled (and probably linked and whatnot) into an executable that can later be executed.</description>
+    </item>
+    
+  </channel>
+</rss>

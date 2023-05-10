@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://pcolladosoto.github.io/sitemap.xml

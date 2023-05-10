@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# This pre-commit hook builds the static site, checking everything is okay.
+# Please refer to https://rjzaworski.com/2018/01/keeping-git-hooks-in-sync
+# for a great discussion on Git Hooks and some fun/interesting links.
+# You should also check Git's documentation on hooks: https://git-scm.com/docs/githooks
+# and https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks are good places to
+# start. Other than that, bear in mind the current directory for hooks is by default
+# the repository's root. This can also be controlled by the `GIT_DIR` environment
+# variable though...
+
+# Let's check whether hugo is installed...
+if ! command -v hugo &> /dev/null
+then
+	cat <<-EOF
+		Hugo couldn't be found... It's needed to build the static site!
+
+		You can install it as explained on https://gohugo.io/installation/
+
+		If you know what you are doing you can disable this check using:
+
+		  git config hooks.allownonascii true
+	EOF
+
+    exit 1
+fi
+
+# Time to build the site without a ton of noise...
+if ! hugo --quiet
+then
+	cat <<-EOF
+		Error building the static site with `hugo --quiet`...
+
+		Try to run it manually to check what's wrong.
+
+		If you know what you are doing you can disable this check using:
+
+		  git config hooks.allownonascii true
+	EOF
+	exit 1
+fi
+
+# It all looks good!
+exit 0

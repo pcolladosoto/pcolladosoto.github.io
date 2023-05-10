@@ -1,0 +1,168 @@
+# Check https://gohugo.io/getting-started/configuration/ for a reference!
+
+# The absolute URL (protocol, host, path, and trailing slash) of your published site.
+baseURL: "https://pcolladosoto.github.io/"
+
+# Site title.
+title: "Just another Jedi..."
+
+# Default number of elements per page. Default is 10.
+paginate: 5
+
+# A language tag as defined by RFC 5646. This value is used to populate:
+#     - The <language> element in the internal RSS template
+#     - The lang attribute of the <html> element in the internal alias template
+languageCode: "en-gb"
+
+# Theme to use. It should be a directory name under `./themes`.
+theme: "PaperMod"
+
+
+# Enable generation of robots.txt file. Default is false.
+enableRobotsTXT: true
+
+# Google Analytics tracking ID (in case we ever want that...)
+# googleAnalytics: "G-ANALYTICS-ID"
+
+# We can control "minification" of the generated content.
+# Check https://gohugo.io/getting-started/configuration/#configure-minify
+# for more info...
+# minify:
+#   disableXML: true
+#   minifyOutput: true
+
+# Theme-specific variables. Check https://github.com/adityatelange/hugo-PaperMod/wiki/Variables
+# for more info on them...
+params:
+  # To enable google analytics, opengraph, twitter-cards and schema.
+  env: "production"
+
+  # The site's title (no kidding).
+  title: "Just another Jedi..."
+
+  # The site's general description.
+  description: "Random thoughts, ideas and the like."
+
+  # Keywords broadly describing the site's purpose.
+  keywords: ["Blog", "Portfolio", "Documentation"]
+
+  # That's us!
+  author: "Pablo Collado Soto"
+
+  # An image shown when linking the site and such.
+  images: ["me.png"]
+
+  # Date format specification. Check https://gohugo.io/functions/format/
+  # for more info on it!
+  DateFormat: "02/01/2016"
+
+  # Let the user's config choose the theme style...
+  defaultTheme: "auto"
+
+  # Let the user choose the theme style at will.
+  disableThemeToggle: false
+
+  # Show the user the estimated reading time left on the article or post.
+  ShowReadingTime: true
+
+  # Show share buttons at the bottom of the post.
+  ShowShareButtons: true
+
+  # Don't show previous and next post menus at the bottom.
+  ShowPostNavLinks: false
+
+  # Disable breadcrumb navigation at the top (I don't really know what that is...)
+  ShowBreadCrumbs: false
+
+  # Show code copy buttons so it's easier to grab code samples.
+  ShowCodeCopyButtons: true
+
+  # Store the word count in the post's metadata.
+  ShowWordCount: true
+
+  # Don't show the RSS icon in section, list and term pages.
+  ShowRssButtonInSectionTermList: false
+
+  # Use Hugo's default Table of Contents instead of a custom one.
+  UseHugoToc: true
+
+  # Disable special appearance for the first post
+  disableSpecial1stPost: true
+
+  # Enable the "scroll to the top" button.
+  disableScrollToTop: false
+
+  # Disable/hide comments.
+  comments: false
+
+  # Show metadata elements such as remaining reading time, for instance.
+  hidemeta: false
+
+  # Show the article's summary in list pages.
+  hideSummary: false
+
+  # Show the Table of Contents in posts.
+  showtoc: true
+
+  # Don't open the Table of Contents by default when loading a post.
+  tocopen: false
+
+  # Control various assets such as favicons and the like.
+  assets:
+    # Where's the favicon?
+    favicon: "favicon.ico"
+
+    # Disable Highlight.js to use Chroma. Check
+    # https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
+    # for more information.
+    disableHLJS: true
+
+
+  # Social icons at the bottom of the page...
+  socialIcons:
+    - name: "github"
+      title: "GitHub"
+      url: "https://github.com/pcolladosoto"
+
+  # Fuse.js is a lightweight fuzzy-search library. Refer to
+  # https://fusejs.io/api/options.html for information on what
+  # these do.
+  fuseOpts:
+    # Keys to search for
+    keys: ["title", "permalink", "summary", "content"]
+
+    # Matches should begin being looked for after 3 characters are included.
+    minMatchCharLength: 3
+
+# Hugo's menu definition. Check https://gohugo.io/content-management/menus/#define-in-site-configuration
+menu:
+  main:
+    - identifier: "posts"
+      name: "Posts"
+      url: "posts/"
+      weight: 20
+
+    - identifier: "synth"
+      name: "Synth"
+      url: "synth/"
+      weight: 30
+
+
+# We need to work a bit to use Hugo's default Chroma highlighter...
+# Check https://gohugo.io/content-management/syntax-highlighting/ for
+# more info on Chroma. Bear in mind if we want to use `lineNos: true`
+# we MUST include `noClasses: true` so that backgrounds appear okay.
+# The thing is, we need to generate the classes for highlighting manually
+# with a Hugo command as seen on the following site:
+# https://gohugo.io/content-management/syntax-highlighting/#generate-syntax-highlighter-css.
+# We also need to set `background-color: unset !important;` on the `.chroma` class in the
+# generated CSS file as seen on:
+# https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma.
+markup:
+  highlight:
+    # anchorLineNos: true
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    noClasses: false
+    style: "onedark"
