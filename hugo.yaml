@@ -3,6 +3,9 @@
 # The absolute URL (protocol, host, path, and trailing slash) of your published site.
 baseURL: "https://pcolladosoto.github.io/"
 
+# Write to the docs directory so as to make Hugo GitHub Pages-compatible
+publishDir: "docs"
+
 # Site title.
 title: "Just another Jedi..."
 
