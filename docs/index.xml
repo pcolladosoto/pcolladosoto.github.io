@@ -11,7 +11,17 @@
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
-    <lastBuildDate>Tue, 26 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://pcolladosoto.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 15 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://pcolladosoto.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Some fun Git facts I&#39;ve come across</title>
+      <link>https://pcolladosoto.github.io/posts/git-fun-facts/</link>
+      <pubDate>Mon, 15 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://pcolladosoto.github.io/posts/git-fun-facts/</guid>
+      <description>Some fun Git facts I&amp;rsquo;ve come across Even though I don&amp;rsquo;t get to spend as much time with git as I would like, I still manage to find some interesting and fun facts I had no idea existed in the first place.
+Instead of jotting them down some place I would surely forget, I decided to collect them here so that I know where to find them. I&amp;rsquo;m bound to run into them sometime in the future at least&amp;hellip;</description>
+    </item>
+    
     <item>
       <title>Checking a system&#39;s endianness</title>
       <link>https://pcolladosoto.github.io/posts/endianness/</link>
