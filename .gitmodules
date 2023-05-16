@@ -1,0 +1,3 @@
+[submodule "docs/synth"]
+	path = docs/synth
+	url = https://github.com/pcolladosoto/synth.git
