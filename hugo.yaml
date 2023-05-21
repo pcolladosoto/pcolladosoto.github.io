@@ -150,6 +150,10 @@ menu:
       url: "synth/"
       weight: 30
 
+    - identifier: "flatland"
+      name: "FlatLand"
+      url: "flatland/"
+      weight: 30
 
 # We need to work a bit to use Hugo's default Chroma highlighter...
 # Check https://gohugo.io/content-management/syntax-highlighting/ for
