@@ -20,9 +20,11 @@ languageCode: "en-gb"
 # Theme to use. It should be a directory name under `./themes`.
 theme: "PaperMod"
 
-
 # Enable generation of robots.txt file. Default is false.
 enableRobotsTXT: true
+
+# Let there be emoji!
+enableEmoji: true
 
 # Google Analytics tracking ID (in case we ever want that...)
 # googleAnalytics: "G-ANALYTICS-ID"
@@ -57,7 +59,7 @@ params:
 
   # Date format specification. Check https://gohugo.io/functions/format/
   # for more info on it!
-  DateFormat: "2016-01-02"
+  # DateFormat: "2016-01-02"
 
   # Let the user's config choose the theme style...
   defaultTheme: "auto"
@@ -69,7 +71,7 @@ params:
   ShowReadingTime: true
 
   # Show share buttons at the bottom of the post.
-  ShowShareButtons: true
+  ShowShareButtons: false
 
   # Don't show previous and next post menus at the bottom.
   ShowPostNavLinks: false
@@ -87,7 +89,7 @@ params:
   ShowRssButtonInSectionTermList: false
 
   # Use Hugo's default Table of Contents instead of a custom one.
-  UseHugoToc: true
+  UseHugoToc: false
 
   # Disable special appearance for the first post
   disableSpecial1stPost: true
@@ -119,7 +121,6 @@ params:
     # https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
     # for more information.
     disableHLJS: true
-
 
   # Social icons at the bottom of the page...
   socialIcons:
