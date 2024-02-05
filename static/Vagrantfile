@@ -1,0 +1,26 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.box = "generic/fedora35"
+    config.vm.provision "shell", privileged: false, run: "always", inline: <<-SHELL
+        sudo systemctl disable --now firewalld
+    SHELL
+    config.vm.provider "virtualbox" do |v|
+    v.customize ["modifyvm", :id, "--memory", 1024]
+  end
+
+  config.vm.define "wg-server" do |wgs|
+    wgs.vm.hostname = 'wg-server'
+    wgs.vm.network :private_network, ip: "10.0.123.2"
+  end
+
+  config.vm.define "wg-client-a" do |wga|
+    wga.vm.hostname = 'wg-client-a'
+    wga.vm.network :private_network, ip: "10.0.123.3"
+  end
+
+  config.vm.define "wg-client-b" do |wgb|
+    wgb.vm.hostname = 'wg-client-b'
+    wgb.vm.network :private_network, ip: "10.0.123.4"
+  end
+end
