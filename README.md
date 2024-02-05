@@ -1,4 +1,20 @@
 # My personal site
+Hi! Welcome to the inside of my personal website: it's not that bad is it? It's just a bit of MarkDown assembled with Hugo!
+
+The site's deployment has been automated and is taken care of by a GitHub Action that's been lifted verbatim from Hugo's doc.
+That basically means nothing needs to be done ofr pushing changes aside from following the usual git workflow.
+
+## Checking changes locally
+However, we'd rather spot errors and/or typos before pushing changes: that's where Hugo comes to the rescue! We can just
+run the following to serve a fresh copy (refreshed with every file change actually) with a local HTTP server:
+
+    $ hugo server
+
+We can also check building works as expected even though having `hugo server` work is more than enough proof...
+
+    $ hugo build
+
+These two commands allow us to push stuff we know looks good!
 
 ## Hook installation
 We've written a hook to make sure the site is built whenever a commit is made.
