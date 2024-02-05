@@ -2,6 +2,7 @@
 title: "Controlling access through a WireGuard VPN"
 tags: ["networking", "wireguard", "vpn", "iptables", "access-control"]
 date: "2022-03-13"
+summary: "WireGuard exposes a network model we can toy with. This post covers how to enforce access control based on a WireGuard VPN alone!"
 ---
 
 # Why would we want to control access to a machine?

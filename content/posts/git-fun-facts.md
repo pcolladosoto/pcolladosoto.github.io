@@ -2,6 +2,7 @@
 title: "Some fun Git facts I've come across"
 tags: ["git", "fun-facts"]
 date: "2023-05-15"
+summary: "Git is an amazing tool that's so bit you sometimes run into quirks: I'm just writing them down!"
 ---
 
 # Some fun Git facts I've come across

@@ -1,7 +1,8 @@
 ---
-title: Ciberseg 2024 Writeup
+title: "Ciberseg 2024 Writeup"
 tags: ["CTF", "UAH"]
-date: "29-01-2024"
+date: 2024-01-29
+summary: "Explaining how (most of) UAH's 2024 CTF challenges can be solved. Thanks a ton to contributors @davidcawork and @FooManroot!"
 ---
 
 # Ciberseg's 2024 CTF Writeup

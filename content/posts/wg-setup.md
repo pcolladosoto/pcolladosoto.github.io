@@ -2,6 +2,7 @@
 title: "Setting up a WireGuard VPN"
 tags: ["networking", "wireguard", "vpn"]
 date: "2022-03-12"
+summary: "Just drop OpenVPN: the cool kids are all using WireGuard now..."
 ---
 
 # So... what are VPNs really?

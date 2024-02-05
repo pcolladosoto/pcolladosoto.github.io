@@ -2,6 +2,7 @@
 title: "Cross Compiling stuff with Docker"
 tags: ["cross-compilation", "docker"]
 date: "2021-11-14"
+summary: "Cross-compiling can be quite a pain if not on Linux, but Docker can lend a hand! Let's see how..."
 ---
 
 # Do we really have to compile stuff in the 21st century?

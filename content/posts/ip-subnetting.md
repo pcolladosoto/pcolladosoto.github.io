@@ -2,6 +2,7 @@
 title: An introduction to subnetting in IP networks
 tags: ["networking-fundamentals", "IPv4", "IPv6"]
 date: "2021-12-16"
+summary: "Even though we hope IPv4 goes away at some points, you can't ride the net without knowing what subnetting's all about..."
 ---
 
 # What was an IP again?

@@ -2,6 +2,7 @@
 title: "Checking a system's endianness"
 tags: ["fundamentals", "programming", "c", "go"]
 date: "2022-04-26"
+summary: "Endianness is a concept that's sometimes elusive. Let's try to shine a light with C and Go!"
 ---
 
 # So... what's endianness?

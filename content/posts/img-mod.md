@@ -2,6 +2,7 @@
 title: "Persistently modifying an operating system image"
 tags: ["fdisk", "mount", "partitions", "raspberrypi", "bash"]
 date: "2022-04-26"
+summary: "Images provided by manufacturers don't always hit the spot: they just need a bit of pizzazz!"
 ---
 
 # Why would we want to do this?
