@@ -4,7 +4,7 @@
 baseURL: "https://pcolladosoto.github.io/"
 
 # Write to the docs directory so as to make Hugo GitHub Pages-compatible
-publishDir: "docs"
+# publishDir: "docs"
 
 # Site title.
 title: "Just another Jedi..."
