@@ -1,7 +1,3 @@
-[submodule "docs/synth"]
-	path = docs/synth
-	url = https://github.com/pcolladosoto/synth.git
-
 [submodule "themes/terminal"]
 	path = themes/terminal
 	url = https://github.com/panr/hugo-theme-terminal.git
