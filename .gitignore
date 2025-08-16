@@ -4,3 +4,6 @@
 
 # Ignore the public directory
 public/
+
+# Ignore bundled sites
+*.tar.gz
