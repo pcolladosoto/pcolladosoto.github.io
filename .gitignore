@@ -1,3 +1,6 @@
-# Ignore hidden files exept gitignore itself
+# Ignore hidden files except the .gitignore itself
 .*
 !.gitignore
+
+# Ignore the public directory
+public/
